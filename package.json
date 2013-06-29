@@ -1,0 +1,22 @@
+{
+  "name": "glance",
+  "version": "0.0.0",
+  "description": "disposable fileserver",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jarofghosts/glance.git"
+  },
+  "keywords": [
+    "file",
+    "server"
+  ],
+  "author": "jesse keane",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jarofghosts/glance/issues"
+  }
+}

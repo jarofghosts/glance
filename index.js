@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 var c = require('commander'),
     fs = require('fs'),
     parse = require('url').parse,

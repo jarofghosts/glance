@@ -2,7 +2,10 @@
   "name": "glance",
   "version": "0.0.1",
   "description": "disposable fileserver",
-  "main": "run",
+  "main": "index.js",
+  "bin": {
+    "glance": "./index.js"
+  },
   "scripts": {
     "test": "node test/test.js"
   },

@@ -4,7 +4,7 @@ var c = require('commander'),
     http = require('http');
 
 c
-  .version('0.0.0')
+  .version('0.0.1')
   .option('-d, --dir [dirname]', 'serve files from [dirname] | default cwd')
   .option('-p, --port [num]', 'serve on port [num] | default 61403', parseInt)
   .option('-v, --verbose', 'log connections to console | default off')

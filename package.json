@@ -18,5 +18,8 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/jarofghosts/glance/issues"
+  },
+  "dependencies": {
+    "commander": "~1.2.0"
   }
 }

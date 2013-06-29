@@ -1,8 +1,8 @@
 {
   "name": "glance",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "disposable fileserver",
-  "main": "index.js",
+  "main": "run",
   "scripts": {
     "test": "node test/test.js"
   },
@@ -19,6 +19,7 @@
   "bugs": {
     "url": "https://github.com/jarofghosts/glance/issues"
   },
+  "preferGlobal": true,
   "dependencies": {
     "commander": "~1.2.0"
   }

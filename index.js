@@ -2,10 +2,11 @@
 var c = require('commander'),
     fs = require('fs'),
     parse = require('url').parse,
-    http = require('http');
+    http = require('http'),
+    path = require('path');
 
 c
-  .version('0.0.1')
+  .version('0.0.2')
   .option('-d, --dir [dirname]', 'serve files from [dirname] | default cwd')
   .option('-p, --port [num]', 'serve on port [num] | default 61403', parseInt)
   .option('-v, --verbose', 'log connections to console | default off')
@@ -14,6 +15,10 @@ c
 var port = c.port || 61403,
     dir = c.dir || process.cwd(),
     verbose = c.verbose;
+
+if (!dir.match(/^\//) || dir.match(/^\./)) {
+  dir = path.normalize(dir);
+}
 
 http.createServer(function (req, res) {
   if (req.method.toLowerCase() != 'get') {

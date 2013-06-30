@@ -38,8 +38,7 @@ Glance.prototype.start = function () {
 
   this.server = http.createServer(function (req, res) { 
     var request = {
-        reqPath: parse(req.url).pathname,
-        fullPath: this.dir + reqPath,
+        fullPath: this.dir + parse(req.url).pathname,
         ip: req.socket.remoteAddress,
         method: req.method.toLowerCase(),
         response: res
@@ -48,7 +47,7 @@ Glance.prototype.start = function () {
       this.emit('error', 403, request);
       return;
     }
-    fs.stat(fullPath, function (err, stat) {
+    fs.stat(request.fullPath, function (err, stat) {
       if (err) {
         this.emit('error', 404, request);
         return;
@@ -59,8 +58,8 @@ Glance.prototype.start = function () {
       }
       this.emit('read', request);
       
-      res.writeHead(200, { 'Content-Type': mime.lookup(fullPath) });
-      fs.createReadStream(fullPath).pipe(res);
+      res.writeHead(200, { 'Content-Type': mime.lookup(request.fullPath) });
+      fs.createReadStream(request.fullPath).pipe(res);
     
     }.bind(this));
 
@@ -87,7 +86,7 @@ module.exports.Glance = Glance;
 
   if (require.main === module) {
   c
-    .version('0.0.6')
+    .version('0.1.1')
     .option('-d, --dir [dirname]', 'serve files from [dirname] | default cwd')
     .option('-p, --port [num]', 'serve on port [num] | default 61403', parseInt)
     .option('-v, --verbose', 'log connections to console | default off')

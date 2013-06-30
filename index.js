@@ -6,13 +6,15 @@ var c = require('commander'),
     http = require('http'),
     EventEmitter = require('events').EventEmitter,
     util = require('util'),
-    path = require('path');
+    path = require('path'),
+    htmlls = require('html-ls');
 
 function Glance(options) {
 
   options = options || {};
 
   this.port = options.port || 61403;
+  this.indexing = options.indexing;
   this.dir = options.dir || process.cwd();
   this.verbose = options.verbose;
 
@@ -52,7 +54,12 @@ Glance.prototype.start = function () {
         return;
       }
       if (stat.isDirectory()) {
-        this.emit('error', 'no-index', request);
+        if (this.indexing) {
+          res.writeHead(200, { "Content-Type": "text/html" });
+          htmlls(request.fullPath).pipe(res);
+        } else {
+          this.emit('error', 'no-index', request);
+        }
         return;
       }
       this.emit('read', request);
@@ -87,6 +94,7 @@ module.exports.Glance = Glance;
   c
     .version('0.1.4')
     .option('-d, --dir [dirname]', 'serve files from [dirname] | default cwd')
+    .option('-i, --indexing', 'turn on autoindexing for directory requests | default off')
     .option('-p, --port [num]', 'serve on port [num] | default 61403', parseInt)
     .option('-v, --verbose', 'log connections to console | default off')
     .parse(process.argv);
@@ -94,6 +102,7 @@ module.exports.Glance = Glance;
   new Glance({
     port: c.port,
     dir: c.dir,
+    indexing: c.indexing,
     verbose: c.verbose
   }).start();
 

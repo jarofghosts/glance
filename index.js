@@ -10,7 +10,6 @@ var c = require('commander'),
 
 function Glance(options) {
 
-
   options = options || {};
 
   this.port = options.port || 61403;

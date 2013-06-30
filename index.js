@@ -73,7 +73,6 @@ function showError(errorCode, res) {
   fs.createReadStream(__dirname + '/errors/' + errorCode + '.html').pipe(res);
 }
 
-
 module.exports.createGlance = function (options) {
   return new Glance(options);
 };
@@ -87,10 +86,9 @@ c
   .option('-v, --verbose', 'log connections to console | default off')
   .parse(process.argv);
 
-var glance = new Glance({
+new Glance({
   port: c.port,
   dir: c.dir,
   verbose: c.verbose
-});
-glance.start();
+}).start();
 

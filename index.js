@@ -85,7 +85,7 @@ module.exports.Glance = Glance;
 
   if (require.main === module) {
   c
-    .version('0.1.2')
+    .version('0.1.3')
     .option('-d, --dir [dirname]', 'serve files from [dirname] | default cwd')
     .option('-p, --port [num]', 'serve on port [num] | default 61403', parseInt)
     .option('-v, --verbose', 'log connections to console | default off')

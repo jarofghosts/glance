@@ -79,16 +79,19 @@ module.exports.createGlance = function (options) {
 
 module.exports.Glance = Glance;
 
-c
-  .version('0.0.5')
-  .option('-d, --dir [dirname]', 'serve files from [dirname] | default cwd')
-  .option('-p, --port [num]', 'serve on port [num] | default 61403', parseInt)
-  .option('-v, --verbose', 'log connections to console | default off')
-  .parse(process.argv);
+  if (require.main === module) {
+  c
+    .version('0.0.5')
+    .option('-d, --dir [dirname]', 'serve files from [dirname] | default cwd')
+    .option('-p, --port [num]', 'serve on port [num] | default 61403', parseInt)
+    .option('-v, --verbose', 'log connections to console | default off')
+    .parse(process.argv);
 
-new Glance({
-  port: c.port,
-  dir: c.dir,
-  verbose: c.verbose
-}).start();
+  new Glance({
+    port: c.port,
+    dir: c.dir,
+    verbose: c.verbose
+  }).start();
+
+}
 

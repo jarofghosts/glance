@@ -13,37 +13,55 @@ c
   .option('-v, --verbose', 'log connections to console | default off')
   .parse(process.argv);
 
-var port = c.port || 61403,
-    dir = c.dir || process.cwd(),
-    verbose = c.verbose;
+new Glance({
+  port: c.port,
+  dir: c.dir,
+  verbose: c.verbose
+});
 
-if (!dir.match(/^\//) || dir.match(/^\./)) {
-  dir = path.normalize(dir);
-}
+function Glance(options) {
 
-http.createServer(function (req, res) { 
-  var reqPath = parse(req.url).pathname,
-      fullPath = dir + reqPath,
-      ip = req.socket.remoteAddress,
-      method = req.method.toLowerCase();
-  if (method != 'get') {
-    if (verbose) { console.log(ip + ' tried to ' + method + ' ' + fullPath); }
-    showError(403, res);
-    return;
+  this.port = options.port || 61403;
+  this.dir = options.dir || process.cwd();
+  this.verbose = options.verbose;
+
+  if (!this.dir.match(/^\//) || this.dir.match(/^\./)) {
+    this.dir = path.normalize(this.dir);
   }
-  fs.stat(fullPath, function (err, stat) {
-    if (err || !stat.isFile()) {
-      if (verbose) { console.log(ip + ' 404 on ' + fullPath); }
-      showError(404, res);
+
+  http.createServer(function (req, res) { 
+    var reqPath = parse(req.url).pathname,
+        fullPath = this.dir + reqPath,
+        ip = req.socket.remoteAddress,
+        method = req.method.toLowerCase();
+    if (method != 'get') {
+      if (this.verbose) { console.log(ip + ' tried to ' + method + ' ' + fullPath); }
+      showError(403, res);
       return;
     }
-    if (verbose) { console.log(ip + ' reading ' + fullPath); }
-    res.setHeader('Content-Type', mime.lookup(fullPath));
-    fs.createReadStream(dir + reqPath).pipe(res);
-  });
-}).listen(port);
+    fs.stat(fullPath, function (err, stat) {
+      if (err) {
+        if (this.verbose) { console.log(ip + ' 404 on ' + fullPath); }
+        showError(404, res);
+        return;
+      }
+      if (stat.isDirectory()) {
+        if (this.verbose) { console.log(ip + ' attempt dir list on ' + fullPath); }
+        showError('no-index', res);
+        return;
+      }
+      if (this.verbose) { console.log(ip + ' reading ' + fullPath); }
+      res.setHeader('Content-Type', mime.lookup(fullPath));
+      fs.createReadStream(fullPath).pipe(res);
+    }.bind(this));
+  }.bind(this)).listen(this.port);
+}
 
 function showError(errorCode, res) {
   fs.createReadStream(__dirname + '/errors/' + errorCode + '.html').pipe(res);
 }
 
+module.exports.createGlance = function (options) {
+  return new Glance(options);
+};
+module.exports.Glance = Glance;

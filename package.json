@@ -28,6 +28,7 @@
   "preferGlobal": true,
   "dependencies": {
     "commander": "~1.2.0",
-    "mime": "~1.2.9"
+    "mime": "~1.2.9",
+    "html-ls": "0.0.1"
   }
 }

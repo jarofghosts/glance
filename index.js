@@ -55,8 +55,9 @@ Glance.prototype.start = function () {
       }
       if (stat.isDirectory()) {
         if (this.indexing) {
+          var listPath = request.fullPath.replace(/\/$/, '');
           res.writeHead(200, { "Content-Type": "text/html" });
-          htmlls(request.fullPath).pipe(res);
+          htmlls(listPath).pipe(res);
         } else {
           this.emit('error', 'no-index', request);
         }

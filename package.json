@@ -29,6 +29,6 @@
   "dependencies": {
     "commander": "~1.2.0",
     "mime": "~1.2.9",
-    "html-ls": "0.0.1"
+    "html-ls": "0.0.2"
   }
 }

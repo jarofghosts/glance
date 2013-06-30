@@ -38,7 +38,7 @@ http.createServer(function (req, res) {
       return;
     }
     if (verbose) { console.log(ip + ' reading ' + fullPath); }
-    res.sendHeader('Content-Type', mime.lookup(fullPath));
+    res.setHeader('Content-Type', mime.lookup(fullPath));
     fs.createReadStream(dir + reqPath).pipe(res);
   });
 }).listen(port);

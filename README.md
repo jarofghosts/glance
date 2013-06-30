@@ -51,7 +51,7 @@ g.on('error', function (req) {
 });
 ````
 
-## options
+## command line options
 
 `glance`
 + `-d [dir]` serve a different directory than the current working directory

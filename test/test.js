@@ -28,8 +28,32 @@ function testError() {
   http.get('http://localhost:16661/nofile.md', function (res) {
     assert.equal(res.statusCode, 404);
     res.on('data', function (data) {})
-    res.on('end', tearDown);
+    res.on('end', testDirList);
   });
+}
+function testDirList() {
+  http.get('http://localhost:16661/', function (res) {
+    assert.equal(res.statusCode, 403);
+    res.on('data', function () {});
+    res.on('end', testMethod);
+  });
+}
+function testMethod() {
+  ['POST', 'DELETE', 'PUT'].forEach(function (method) {
+    var req = http.request({
+      host: 'localhost',
+      port: 16661,
+      path: '/file.txt',
+      method: method
+    }, function (res) {
+      assert.equal(res.statusCode, 403);
+    });
+    req.on('error', function (e) {
+      console.log(e);
+    });
+    req.end();
+  });
+  tearDown();
 }
 function tearDown() {
   glanceServer.stop();

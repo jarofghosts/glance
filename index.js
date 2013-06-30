@@ -43,7 +43,7 @@ Glance.prototype.start = function () {
         response: res
     };
     if (request.method != 'get') {
-      this.emit('error', 403, request);
+      this.emit('error', 405, request);
       return;
     }
     fs.stat(request.fullPath, function (err, stat) {

@@ -10,6 +10,9 @@ var c = require('commander'),
 
 function Glance(options) {
 
+
+  options = options || {};
+
   this.port = options.port || 61403;
   this.dir = options.dir || process.cwd();
   this.verbose = options.verbose;
@@ -56,20 +59,23 @@ Glance.prototype.start = function () {
       }
       this.emit('read', request);
       
-      res.setHeader('Content-Type', mime.lookup(fullPath));
+      res.writeHead(200, { 'Content-Type': mime.lookup(fullPath) });
       fs.createReadStream(fullPath).pipe(res);
     
     }.bind(this));
 
-  }.bind(this)).listen(this.port);
+  }.bind(this));
+  this.server.listen(this.port);
 
 };
 
 Glance.prototype.stop = function () {
-  this.server.close();
+  this.server && this.server.close();
 };
 
 function showError(errorCode, res) {
+  var code = errorCode != 'no-index' ? errorCode : 403;
+  res.writeHead(code);
   fs.createReadStream(__dirname + '/errors/' + errorCode + '.html').pipe(res);
 }
 
@@ -81,7 +87,7 @@ module.exports.Glance = Glance;
 
   if (require.main === module) {
   c
-    .version('0.0.5')
+    .version('0.0.6')
     .option('-d, --dir [dirname]', 'serve files from [dirname] | default cwd')
     .option('-p, --port [num]', 'serve on port [num] | default 61403', parseInt)
     .option('-v, --verbose', 'log connections to console | default off')

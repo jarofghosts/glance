@@ -16,7 +16,8 @@ function Glance(options) {
   this.port = options.port || 61403;
   this.indexing = options.indexing;
   this.dir = options.dir || process.cwd();
-  this.verbose = options.verbose;
+  this.verbose = !!options.verbose;
+  this.nodot = !!options.nodot;
 
   if (!this.dir.match(/^\//) || this.dir.match(/^\./)) {
     this.dir = path.normalize(this.dir);
@@ -48,6 +49,10 @@ Glance.prototype.start = function () {
       this.emit('error', 405, request);
       return;
     }
+    if (this.nodot && path.basename(request.fullPath).match(/^\./)) {
+      this.emit('error', 404, request);
+      return;
+    }
     fs.stat(request.fullPath, function (err, stat) {
       if (err) {
         this.emit('error', 404, request);
@@ -57,7 +62,7 @@ Glance.prototype.start = function () {
         if (this.indexing) {
           var listPath = request.fullPath.replace(/\/$/, '');
           res.writeHead(200, { "Content-Type": "text/html" });
-          htmlls(listPath).pipe(res);
+          htmlls(listPath, this.nodot).pipe(res);
         } else {
           this.emit('error', 'no-index', request);
         }
@@ -93,9 +98,10 @@ module.exports.Glance = Glance;
 
   if (require.main === module) {
   c
-    .version('0.1.4')
+    .version('0.1.5')
     .option('-d, --dir [dirname]', 'serve files from [dirname] | default cwd')
     .option('-i, --indexing', 'turn on autoindexing for directory requests | default off')
+    .option('-n, --nodot', 'do not list or serve dotfiles | default off')
     .option('-p, --port [num]', 'serve on port [num] | default 61403', parseInt)
     .option('-v, --verbose', 'log connections to console | default off')
     .parse(process.argv);
@@ -104,6 +110,7 @@ module.exports.Glance = Glance;
     port: c.port,
     dir: c.dir,
     indexing: c.indexing,
+    nodot: c.nodot,
     verbose: c.verbose
   }).start();
 

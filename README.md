@@ -26,6 +26,8 @@ var glance = require('glance'),
     g = createGlance({
       dir: '../Files', // defaults to current working dir
       port: 86753, // defaults to 61403
+      indexing: true, // will provide a directory list when requested, defaults to false
+      nodot: true, // will hide dot files from lists and will not serve them, defaults to false
       verbose: true // defaults to false
     });
 
@@ -54,11 +56,13 @@ g.on('error', function (req) {
 ## command line options
 
 `glance`
-+ `-d [dir]` serve a different directory than the current working directory
-+ `-h` print help screen with option listing
-+ `-p [port]` open server a different port than 61403
-+ `-V` print version information
-+ `-v` enable verbose mode, printing log to stdout. Off by default
+- `-d [dir]` serve a different directory than the current working directory
+- `-h` print help screen with option listing
+- `-i` serve a directory index when requested
+- `-n` hide dot files
+- `-p [port]` open server a different port than 61403
+- `-V` print version information
+- `-v` enable verbose mode, printing log to stdout. Off by default
 
 ## license
 

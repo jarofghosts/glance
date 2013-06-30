@@ -46,14 +46,15 @@ function testMethod() {
       path: '/file.txt',
       method: method
     }, function (res) {
-      assert.equal(res.statusCode, 403);
+      assert.equal(res.statusCode, 405);
+      res.on('data', function () {});
     });
     req.on('error', function (e) {
       console.log(e);
     });
     req.end();
   });
-  tearDown();
+  setTimeout(tearDown, 500);
 }
 function tearDown() {
   glanceServer.stop();

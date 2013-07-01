@@ -15,7 +15,7 @@ npm install -g glance
 
 Run `glance` from within a directory and you are immediately serving the files from within that directory
 
-Alternatiely, you can `require('glance')` and use it as a module within your own code.
+Alternatively, you can `require('glance')` and use it as a module within your own code.
 The glance module provides access to the Glance object as well as `createGlance`, a factory method.
 
 Some sample code might just look something like this:

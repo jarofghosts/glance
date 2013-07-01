@@ -5,6 +5,7 @@ var assert = require('assert'),
 
 fs.mkdirSync('glance-test');
 fs.writeFileSync('glance-test/file.txt', 'howdy!');
+fs.writeFileSync('glance-test/file with space.html', 'hey, now!');
 
 var glanceServer = glance.createGlance({ port: 16661, dir: './glance-test' });
 
@@ -21,9 +22,23 @@ http.get('http://localhost:16661/file.txt', function (res) {
   });
   res.on('end', function () {
     assert.equal(text, 'howdy!');
-    testError();
+    testUri();
   });
 });
+function testUri() {
+  http.get('http://localhost:16661/file%20with%20space.html', function (res) {
+    var uritext = '';
+    assert.equal(res.statusCode, 200);
+    assert.equal(res.headers['content-type'], 'text/html');
+    res.on('data', function (data) {
+      uritext += data;
+    });
+    res.on('end', function () {
+      assert.equal(uritext, 'hey, now!');
+      testError();
+    });
+  });
+}
 function testError() {
   http.get('http://localhost:16661/nofile.md', function (res) {
     assert.equal(res.statusCode, 404);
@@ -59,5 +74,6 @@ function testMethod() {
 function tearDown() {
   glanceServer.stop();
   fs.unlinkSync('glance-test/file.txt');
+  fs.unlinkSync('glance-test/file with space.html');
   fs.rmdirSync('glance-test');
 }

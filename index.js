@@ -40,7 +40,7 @@ Glance.prototype.start = function () {
 
   this.server = http.createServer(function (req, res) { 
     var request = {
-        fullPath: this.dir + parse(req.url).pathname,
+        fullPath: this.dir + decodeURIComponent(parse(req.url).pathname),
         ip: req.socket.remoteAddress,
         method: req.method.toLowerCase(),
         response: res
@@ -63,6 +63,7 @@ Glance.prototype.start = function () {
           var listPath = request.fullPath.replace(/\/$/, '');
           res.writeHead(200, { "Content-Type": "text/html" });
           htmlls(listPath, this.nodot).pipe(res);
+          if (this.verbose) { console.log(request.ip + ' directory list ' + fullPath); }
         } else {
           this.emit('error', 'no-index', request);
         }

@@ -63,7 +63,7 @@ Glance.prototype.start = function () {
           var listPath = request.fullPath.replace(/\/$/, '');
           res.writeHead(200, { "Content-Type": "text/html" });
           htmlls(listPath, this.nodot).pipe(res);
-          if (this.verbose) { console.log(request.ip + ' directory list ' + fullPath); }
+          if (this.verbose) { console.log(request.ip + ' directory list ' + request.fullPath); }
         } else {
           this.emit('error', 'no-index', request);
         }

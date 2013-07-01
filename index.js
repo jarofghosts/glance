@@ -65,7 +65,7 @@ Glance.prototype.start = function () {
           htmlls(listPath, this.nodot).pipe(res);
           if (this.verbose) { console.log(request.ip + ' directory list ' + request.fullPath); }
         } else {
-          this.emit('error', 'no-index', request);
+          this.emit('error', 403, request);
         }
         return;
       }
@@ -87,8 +87,7 @@ Glance.prototype.stop = function () {
 };
 
 function showError(errorCode, res) {
-  var code = errorCode != 'no-index' ? errorCode : 403;
-  res.writeHead(code);
+  res.writeHead(errorCode);
   fs.createReadStream(__dirname + '/errors/' + errorCode + '.html').pipe(res);
 }
 
@@ -100,7 +99,7 @@ module.exports.Glance = Glance;
 
   if (require.main === module) {
   c
-    .version('0.1.8')
+    .version('0.1.9')
     .option('-d, --dir [dirname]', 'serve files from [dirname] | default cwd')
     .option('-i, --indexing', 'turn on autoindexing for directory requests | default off')
     .option('-n, --nodot', 'do not list or serve dotfiles | default off')

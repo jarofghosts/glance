@@ -100,7 +100,7 @@ module.exports.Glance = Glance;
 
   if (require.main === module) {
   c
-    .version('0.1.6')
+    .version('0.1.7')
     .option('-d, --dir [dirname]', 'serve files from [dirname] | default cwd')
     .option('-i, --indexing', 'turn on autoindexing for directory requests | default off')
     .option('-n, --nodot', 'do not list or serve dotfiles | default off')

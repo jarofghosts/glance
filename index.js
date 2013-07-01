@@ -78,6 +78,7 @@ Glance.prototype.start = function () {
 
   }.bind(this));
   this.server.listen(this.port);
+  console.log('glance serving ' + this.dir + ' on port ' + this.port);
 
 };
 

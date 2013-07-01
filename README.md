@@ -1,5 +1,5 @@
 glance.js
-==
+===
 
 [![Build Status](https://travis-ci.org/jarofghosts/glance.png?branch=master)](https://travis-ci.org/jarofghosts/glance)
 

@@ -65,7 +65,7 @@ Glance.prototype.start = function () {
           htmlls(listPath, this.nodot).pipe(res);
           if (this.verbose) { console.log(request.ip + ' directory list ' + request.fullPath); }
         } else {
-          this.emit('error', 'no-index', request);
+          this.emit('error', '403', request);
         }
         return;
       }

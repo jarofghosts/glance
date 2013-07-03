@@ -7,7 +7,9 @@ var c = require('commander'),
     EventEmitter = require('events').EventEmitter,
     util = require('util'),
     path = require('path'),
-    htmlls = require('html-ls');
+    colorConsole = require('colorize').console,
+    htmlls = require('html-ls'),
+    isCli = (require.main === module);
 
 function Glance(options) {
 
@@ -30,12 +32,12 @@ util.inherits(Glance, EventEmitter);
 
 Glance.prototype.start = function () {
   this.on('error', function (errorCode, request) {
-    if (this.verbose) { console.log(request.ip + ' error ' + errorCode + ' on ' + request.fullPath); }
+    if (this.verbose) { colorConsole.log('#red[ERR' + errorCode + '] ' + request.ip + ' on #bold[' + request.fullPath + ']'); }
     showError(errorCode, request.response);
   });
 
   this.on('read', function (request) {
-    if (this.verbose) { console.log(request.ip + ' read ' + request.fullPath); }
+    if (this.verbose) { colorConsole.log('#green[INFO] ' + request.ip + ' read #bold[' + request.fullPath + ']'); }
   });
 
   this.server = http.createServer(function (req, res) { 
@@ -63,7 +65,7 @@ Glance.prototype.start = function () {
           var listPath = request.fullPath.replace(/\/$/, '');
           res.writeHead(200, { "Content-Type": "text/html" });
           htmlls(listPath, this.nodot).pipe(res);
-          if (this.verbose) { console.log(request.ip + ' directory list ' + request.fullPath); }
+          this.emit('read', request);
         } else {
           this.emit('error', 403, request);
         }
@@ -76,10 +78,8 @@ Glance.prototype.start = function () {
     
     }.bind(this));
 
-  }.bind(this));
-  this.server.listen(this.port);
-  console.log('glance serving ' + this.dir + ' on port ' + this.port);
-
+  }.bind(this)).listen(this.port);
+  if (isCli || this.verbose) { colorConsole.log('#magenta[glance] serving #bold[' + this.dir + '] on port #green[' + this.port + ']'); }
 };
 
 Glance.prototype.stop = function () {
@@ -97,7 +97,7 @@ module.exports.createGlance = function (options) {
 
 module.exports.Glance = Glance;
 
-  if (require.main === module) {
+  if (isCli) {
   c
     .version('0.1.10')
     .option('-d, --dir [dirname]', 'serve files from [dirname] | default cwd')

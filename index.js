@@ -62,10 +62,9 @@ Glance.prototype.start = function () {
       }
       if (stat.isDirectory()) {
         if (this.indexing) {
-          var showUp = !(request.fullPath == this.dir),
-              listPath = request.fullPath.replace(/\/$/, '');
+          var listPath = request.fullPath.replace(/\/$/, '');
           res.writeHead(200, { "Content-Type": "text/html" });
-          htmlls(listPath, { hideDot: this.nodot, showUp: showUp }).pipe(res);
+          htmlls(listPath, { hideDot: this.nodot }).pipe(res);
           this.emit('read', request);
         } else {
           this.emit('error', 403, request);

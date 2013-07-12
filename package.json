@@ -1,6 +1,6 @@
 {
   "name": "glance",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "disposable fileserver",
   "main": "index.js",
   "bin": {
@@ -29,7 +29,7 @@
   "dependencies": {
     "commander": "~1.2.0",
     "mime": "~1.2.9",
-    "html-ls": ">= 0.0.4",
+    "html-ls": ">= 0.0.6",
     "colorize": "~0.1.0"
   }
 }

@@ -21,9 +21,7 @@ function Glance(options) {
   this.verbose = !!options.verbose;
   this.nodot = !!options.nodot;
 
-  if (!this.dir.match(/^\//) || this.dir.match(/^\./)) {
-    this.dir = path.normalize(this.dir);
-  }
+  if (!this.dir.match(/^\//)) this.dir = path.normalize(this.dir);
 
   return this;
 }

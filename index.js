@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 var c = require('commander'),
     fs = require('fs'),
     mime = require('mime'),

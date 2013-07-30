@@ -16,7 +16,8 @@ npm install -g glance
 Run `glance` from within a directory and you are immediately serving the files from within that directory
 
 If the directory being served has a `.glance.json` file within it, configuration will be read from that. Failing that, glance
-will look for a `~/.glance.json` for directives. Failing **that**, glance will use defaults.
+will look for a `~/.glance.json` for directives. Failing **that**, glance will use defaults. Command line options will always
+override config file options.
 
 ## config format
 

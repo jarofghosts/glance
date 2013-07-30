@@ -2,6 +2,7 @@
 
 var c = require('commander'),
     fs = require('fs'),
+    xtend = require('xtend'),
     mime = require('mime'),
     parse = require('url').parse,
     http = require('http'),
@@ -10,17 +11,33 @@ var c = require('commander'),
     path = require('path'),
     colorConsole = require('colorize').console,
     htmlls = require('html-ls'),
-    isCli = (require.main === module);
+    globalConfigFile = path.normalize(process.env.HOME || process.env.USERPROFILE) + '/.glance.json',
+    isCli = (require.main === module),
+    defaults = {
+      port: 61403,
+      indexing: false,
+      dir: process.cwd(),
+      verbose: false,
+      nodot: false
+    };
+if (fs.existsSync(globalConfigFile)) {
+  var globalConfig = require(globalConfigFile);
+  defaults = xtend(defaults, globalConfig);
+}
+if (fs.existsSync('./.glance.json')) {
+  var localConfig = require('./.glance.json');
+  defaults = xtend(defaults, localConfig);
+}
 
 function Glance(options) {
 
-  options = options || {};
+  options = xtend(defaults, options || {});
 
-  this.port = options.port || 61403;
+  this.port = options.port;
   this.indexing = options.indexing;
-  this.dir = options.dir || process.cwd();
-  this.verbose = !!options.verbose;
-  this.nodot = !!options.nodot;
+  this.dir = options.dir;
+  this.verbose = options.verbose;
+  this.nodot = options.nodot;
 
   if (!this.dir.match(/^\//)) this.dir = path.normalize(this.dir);
 
@@ -31,12 +48,12 @@ util.inherits(Glance, EventEmitter);
 
 Glance.prototype.start = function () {
   this.on('error', function (errorCode, request) {
-    if (this.verbose) { colorConsole.log('#red[ERR' + errorCode + '] ' + request.ip + ' on #bold[' + request.fullPath + ']'); }
+    if (this.verbose) { colorConsole.log(['#red[ERR', errorCode, '] ', request.ip, ' on #bold[', request.fullPath, ']'].join('')); }
     showError(errorCode, request.response);
   });
 
   this.on('read', function (request) {
-    if (this.verbose) { colorConsole.log('#green[INFO] ' + request.ip + ' read #bold[' + request.fullPath + ']'); }
+    if (this.verbose) { colorConsole.log(['#green[INFO] ', request.ip, ' read #bold[', request.fullPath, ']'].join('')); }
   });
 
   this.server = http.createServer(function (req, res) { 
@@ -78,7 +95,7 @@ Glance.prototype.start = function () {
     }.bind(this));
 
   }.bind(this)).listen(this.port);
-  if (isCli || this.verbose) { colorConsole.log('#magenta[glance] serving #bold[' + this.dir + '] on port #green[' + this.port + ']'); }
+  if (isCli || this.verbose) { colorConsole.log(['#magenta[glance] serving #bold[', this.dir, '] on port #green[', this.port, ']'].join('')); }
 };
 
 Glance.prototype.stop = function () {
@@ -106,13 +123,14 @@ module.exports.Glance = Glance;
     .option('-v, --verbose', 'log connections to console | default off')
     .parse(process.argv);
 
-  new Glance({
-    port: c.port,
-    dir: c.dir,
-    indexing: c.indexing,
-    nodot: c.nodot,
-    verbose: c.verbose
-  }).start();
+  var cliOptions = {};
+  if (c.dir !== undefined) cliOptions.dir = c.dir;
+  if (c.indexing !== undefined) cliOptions.indexing = c.indexing;
+  if (c.nodot !== undefined) cliOptions.nodot = c.nodot;
+  if (c.port !== undefined) cliOptions.port = c.port;
+  if (c.verbose !== undefined) cliOptions.verbose = c.verbose;
+
+  new Glance(cliOptions).start();
 
 }
 

@@ -15,6 +15,25 @@ npm install -g glance
 
 Run `glance` from within a directory and you are immediately serving the files from within that directory
 
+If the directory being served has a `.glance.json` file within it, configuration will be read from that. Failing that, glance
+will look for a `~/.glance.json` for directives. Failing **that**, glance will use defaults.
+
+## config format
+
+Your config should be valid json in the following format (shown with defaults):
+
+```json
+{
+  "port": 61403,
+  "indexing": false,
+  "dir": "/whatever/dir/you/are/in",
+  "verbose": false,
+  "nodot": false
+}
+```
+
+## as a module
+
 Alternatively, you can `require('glance')` and use it as a module within your own code.
 The glance module provides access to the Glance object as well as `createGlance`, a factory method.
 

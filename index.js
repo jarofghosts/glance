@@ -20,15 +20,6 @@ var c = require('commander'),
       verbose: false,
       nodot: false
     };
-if (fs.existsSync(globalConfigFile)) {
-  var globalConfig = require(globalConfigFile);
-  defaults = xtend(defaults, globalConfig);
-}
-if (fs.existsSync('./.glance.json')) {
-  var localConfig = require('./.glance.json');
-  defaults = xtend(defaults, localConfig);
-}
-
 function Glance(options) {
 
   options = xtend(defaults, options || {});
@@ -114,23 +105,33 @@ module.exports.createGlance = function (options) {
 module.exports.Glance = Glance;
 
   if (isCli) {
-  c
-    .version('0.2.0')
-    .option('-d, --dir [dirname]', 'serve files from [dirname] | default cwd')
-    .option('-i, --indexing', 'turn on autoindexing for directory requests | default off')
-    .option('-n, --nodot', 'do not list or serve dotfiles | default off')
-    .option('-p, --port [num]', 'serve on port [num] | default 61403', parseInt)
-    .option('-v, --verbose', 'log connections to console | default off')
-    .parse(process.argv);
 
-  var cliOptions = {};
-  if (c.dir !== undefined) cliOptions.dir = c.dir;
-  if (c.indexing !== undefined) cliOptions.indexing = c.indexing;
-  if (c.nodot !== undefined) cliOptions.nodot = c.nodot;
-  if (c.port !== undefined) cliOptions.port = c.port;
-  if (c.verbose !== undefined) cliOptions.verbose = c.verbose;
+    if (fs.existsSync(globalConfigFile)) {
+      var globalConfig = require(globalConfigFile);
+      defaults = xtend(defaults, globalConfig);
+    }
+    if (fs.existsSync('./.glance.json')) {
+      var localConfig = require('./.glance.json');
+      defaults = xtend(defaults, localConfig);
+    }
 
-  new Glance(cliOptions).start();
+    c
+      .version('0.2.0')
+      .option('-d, --dir [dirname]', 'serve files from [dirname] | default cwd')
+      .option('-i, --indexing', 'turn on autoindexing for directory requests | default off')
+      .option('-n, --nodot', 'do not list or serve dotfiles | default off')
+      .option('-p, --port [num]', 'serve on port [num] | default 61403', parseInt)
+      .option('-v, --verbose', 'log connections to console | default off')
+      .parse(process.argv);
+
+    var cliOptions = {};
+    if (c.dir !== undefined) cliOptions.dir = c.dir;
+    if (c.indexing !== undefined) cliOptions.indexing = c.indexing;
+    if (c.nodot !== undefined) cliOptions.nodot = c.nodot;
+    if (c.port !== undefined) cliOptions.port = c.port;
+    if (c.verbose !== undefined) cliOptions.verbose = c.verbose;
+
+    new Glance(cliOptions).start();
 
 }
 

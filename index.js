@@ -111,7 +111,7 @@ module.exports.Glance = Glance;
     }
 
     c
-      .version('0.2.0')
+      .version('0.2.1')
       .option('-d, --dir [dirname]', 'serve files from [dirname] | default cwd')
       .option('-i, --indexing', 'turn on autoindexing for directory requests | default off')
       .option('-n, --nodot', 'do not list or serve dotfiles | default off')

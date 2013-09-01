@@ -93,6 +93,37 @@ Glance.prototype.stop = function () {
   this.server && this.server.close();
 };
 
+Glance.prototype.serveRequest = function (req, res) {
+  var request = {
+      fullPath: this.dir + decodeURIComponent(parse(req.url).pathname),
+      ip: req.socket.remoteAddress,
+      method: req.method.toLowerCase(),
+      response: res
+  };
+  if (request.method != 'get') {
+    return this.emit('error', 405, request);
+  }
+  if (this.nodot && path.basename(request.fullPath).match(/^\./)) {
+    return this.emit('error', 404, request);
+  }
+  fs.stat(request.fullPath, function (err, stat) {
+    if (err) return this.emit('error', 404, request);
+    if (stat.isDirectory()) {
+      if (!this.indexing) return this.emit('error', 403, request);
+      var listPath = request.fullPath.replace(/\/$/, '');
+      res.writeHead(200, { "Content-Type": "text/html" });
+      htmlls(listPath, { hideDot: this.nodot }).pipe(res);
+      return this.emit('read', request);
+    }
+    this.emit('read', request);
+    
+    res.writeHead(200, { 'Content-Type': mime.lookup(request.fullPath) });
+    fs.createReadStream(request.fullPath).pipe(res);
+  
+  }.bind(this));
+
+};
+
 function showError(errorCode, res) {
   res.writeHead(errorCode);
   fs.createReadStream(__dirname + '/errors/' + errorCode + '.html').pipe(res);

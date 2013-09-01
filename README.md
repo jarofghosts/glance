@@ -42,6 +42,7 @@ Some sample code might just look something like this:
 
 ````js
 var glance = require('glance'),
+    http = require('http'),
 // init a glance object with custom options (all totally optional)
     g = createGlance({
       dir: '../Files', // defaults to current working dir
@@ -51,7 +52,13 @@ var glance = require('glance'),
       verbose: true // defaults to false
     });
 
-// start the server
+// pass requests to glance if you wanna
+http.createServer(function (req, res) {
+  if (/^\/static\//.test(req.url)) return g.serveRequest(req, res);
+  // pretend i do other stuff here...
+}).listen(5309);
+
+// or, use it to start a static file server
 g.start();
 
 // listen for read events

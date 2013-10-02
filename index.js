@@ -21,6 +21,8 @@ var c = require('commander'),
       nodot: false
     };
 function Glance(options) {
+  
+  if (!(this instanceof Glance)) return new Glance(options);
 
   options = xtend(defaults, options || {});
 
@@ -101,14 +103,14 @@ module.exports.Glance = Glance;
 
   if (isCli) {
 
-    if (fs.existsSync(globalConfigFile)) {
+    try {
       var globalConfig = require(globalConfigFile);
       defaults = xtend(defaults, globalConfig);
-    }
-    if (fs.existsSync('./.glance.json')) {
+    } catch (e) {}
+    try {
       var localConfig = require('./.glance.json');
       defaults = xtend(defaults, localConfig);
-    }
+    } catch (e) {}
 
     c
       .version('0.2.1')

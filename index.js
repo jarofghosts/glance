@@ -11,7 +11,7 @@ var c = require('commander'),
     path = require('path'),
     colorConsole = require('colorize').console,
     htmlls = require('html-ls'),
-    globalConfigFile = path.normalize(process.env.HOME || process.env.USERPROFILE) + '/.glance.json',
+    globalConfigFile = path.join(path.normalize(process.env.HOME || process.env.USERPROFILE), '.glance.json'),
     isCli = (require.main === module),
     defaults = {
       port: 61403,
@@ -106,9 +106,10 @@ module.exports.Glance = Glance;
       defaults = xtend(defaults, globalConfig);
     } catch (e) {}
     try {
-      var localConfig = require('./.glance.json');
+      var localConfig = require(path.join(process.cwd(), '.glance.json'));
       defaults = xtend(defaults, localConfig);
     } catch (e) {}
+    console.dir(defaults)
 
     c
       .version('0.2.1')

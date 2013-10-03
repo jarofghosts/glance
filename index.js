@@ -41,17 +41,17 @@ util.inherits(Glance, EventEmitter);
 
 Glance.prototype.start = function () {
   this.on('error', function (errorCode, request) {
-    if (this.verbose) { colorConsole.log(['#red[ERR', errorCode, '] ', request.ip, ' on #bold[', request.fullPath, ']'].join('')); }
+    if (this.verbose) colorConsole.log(['#red[ERR', errorCode, '] ', request.ip, ' on #bold[', request.fullPath, ']'].join(''));
     showError(errorCode, request.response);
   });
 
   this.on('read', function (request) {
-    if (this.verbose) { colorConsole.log(['#green[INFO] ', request.ip, ' read #bold[', request.fullPath, ']'].join('')); }
+    if (this.verbose) colorConsole.log(['#green[INFO] ', request.ip, ' read #bold[', request.fullPath, ']'].join(''));
   });
 
   this.server = http.createServer(this.serveRequest.bind(this)).listen(this.port);
 
-  if (isCli || this.verbose) { colorConsole.log(['#magenta[glance] serving #bold[', this.dir, '] on port #green[', this.port, ']'].join('')); }
+  if (isCli || this.verbose) colorConsole.log(['#magenta[glance] serving #bold[', this.dir, '] on port #green[', this.port, ']'].join(''));
 
 };
 
@@ -66,9 +66,7 @@ Glance.prototype.serveRequest = function (req, res) {
       method: req.method.toLowerCase(),
       response: res
   };
-  if (request.method != 'get') {
-    return this.emit('error', 405, request);
-  }
+  if (request.method != 'get') return this.emit('error', 405, request);
   if (this.nodot && path.basename(request.fullPath).match(/^\./)) {
     return this.emit('error', 404, request);
   }

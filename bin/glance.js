@@ -22,9 +22,9 @@ c
   .version(version)
   .option('-d, --dir [dirname]',
       'serve files from [dirname] | default cwd')
-  .option('-i, --indexing <files>',
+  .option('-i, --indexing',
       'turn on autoindexing for directory requests | default off')
-  .option('-I, --indices',
+  .option('-I, --indices <files>',
       'comma-separated list of files considered as an "index"')
   .option('-n, --nodot',
       'do not list or serve dotfiles | default off')

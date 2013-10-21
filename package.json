@@ -1,6 +1,6 @@
 {
   "name": "glance",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "disposable fileserver",
   "main": "index.js",
   "bin": {

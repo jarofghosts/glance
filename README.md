@@ -29,6 +29,7 @@ Your config should be valid json in the following format (shown with defaults):
   "indexing": false,
   "dir": "/whatever/dir/you/are/in",
   "verbose": false,
+  "indices": [],
   "nodot": false
 }
 ```
@@ -47,6 +48,7 @@ var glance = require('glance'),
     g = createGlance({
       dir: '../Files', // defaults to current working dir
       port: 86753, // defaults to 61403
+      indices: [], // use these file names to provide indices
       indexing: true, // will provide a directory list when requested, defaults to false
       nodot: true, // will hide dot files from lists and will not serve them, defaults to false
       verbose: true // defaults to false
@@ -86,6 +88,7 @@ g.on('error', function (req) {
 - `-d [dir]` serve a different directory than the current working directory
 - `-h` print help screen with option listing
 - `-i` serve a directory index when requested
+- `-I` comma-separated file names to use as indices
 - `-n` hide dot files
 - `-p [port]` open server a different port than 61403
 - `-V` print version information

@@ -19,7 +19,7 @@ var c = require('commander'),
       dir: process.cwd(),
       verbose: false,
       nodot: false
-    };
+    }
 function Glance(options) {
   
   if (!(this instanceof Glance)) return new Glance(options)

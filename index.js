@@ -1,7 +1,4 @@
-#!/usr/bin/env node
-
-var c = require('commander'),
-    fs = require('fs'),
+var fs = require('fs'),
     xtend = require('xtend'),
     mime = require('mime'),
     parse = require('url').parse,
@@ -11,11 +8,10 @@ var c = require('commander'),
     path = require('path'),
     colorConsole = require('colorize').console,
     htmlls = require('html-ls'),
-    globalConfigFile = path.join(path.normalize(process.env.HOME || process.env.USERPROFILE), '.glance.json'),
-    isCli = (require.main === module),
     defaults = {
       port: 61403,
       indexing: false,
+      indices: [],
       dir: process.cwd(),
       verbose: false,
       nodot: false
@@ -28,6 +24,7 @@ function Glance(options) {
 
   this.port = options.port
   this.indexing = options.indexing
+  this.indices = options.indices
   this.dir = options.dir
   this.verbose = options.verbose
   this.nodot = options.nodot
@@ -54,7 +51,7 @@ Glance.prototype.start = function () {
   this.server = http.createServer(this.serveRequest.bind(this))
     .listen(this.port);
 
-  if (isCli || this.verbose) colorConsole.log(['#magenta[glance] ',
+  if (this.verbose) colorConsole.log(['#magenta[glance] ',
     'serving #bold[', this.dir, '] on port #green[', this.port, ']'].join(''))
 
 }
@@ -79,6 +76,14 @@ Glance.prototype.serveRequest = function (req, res) {
     if (err) return this.emit('error', 404, request)
     if (stat.isDirectory()) {
       if (!this.indexing) return this.emit('error', 403, request)
+      if (this.indices && this.indices.length) {
+        for (var i = 0, l = this.indices.length; i < l; ++i) {
+          if (fs.existsSync(path.join(request.fullPath, this.indices[i]))) {
+            req.url = path.join(req.url, this.indices[i])
+            return this.serveRequest(req, res)
+          }
+        }
+      }
       var listPath = request.fullPath.replace(/\/$/, '')
       res.writeHead(200, { 'Content-Type': 'text/html' })
       htmlls(listPath, { hideDot: this.nodot }).pipe(res);
@@ -103,36 +108,3 @@ module.exports.createGlance = function (options) {
 }
 
 module.exports.Glance = Glance
-
-  if (isCli) {
-
-    try {
-      var globalConfig = require(globalConfigFile);
-      defaults = xtend(defaults, globalConfig);
-    } catch (e) {}
-    try {
-      var localConfig = require(path.join(process.cwd(), '.glance.json'));
-      defaults = xtend(defaults, localConfig);
-    } catch (e) {}
-    console.dir(defaults)
-
-    c
-      .version('0.2.1')
-      .option('-d, --dir [dirname]', 'serve files from [dirname] | default cwd')
-      .option('-i, --indexing', 'turn on autoindexing for directory requests | default off')
-      .option('-n, --nodot', 'do not list or serve dotfiles | default off')
-      .option('-p, --port [num]', 'serve on port [num] | default 61403', parseInt)
-      .option('-v, --verbose', 'log connections to console | default off')
-      .parse(process.argv);
-
-    var cliOptions = {};
-    if (c.dir !== undefined) cliOptions.dir = c.dir;
-    if (c.indexing !== undefined) cliOptions.indexing = c.indexing;
-    if (c.nodot !== undefined) cliOptions.nodot = c.nodot;
-    if (c.port !== undefined) cliOptions.port = c.port;
-    if (c.verbose !== undefined) cliOptions.verbose = c.verbose;
-
-    new Glance(cliOptions).start();
-
-}
-

@@ -5,6 +5,7 @@ var assert = require('assert'),
 
 fs.mkdirSync('glance-test');
 fs.writeFileSync('glance-test/file.txt', 'howdy!');
+fs.writeFileSync('glance-test/index.html', 'wee');
 fs.writeFileSync('glance-test/file with space.html', 'hey, now!');
 
 var glanceServer = glance.createGlance({ port: 16661, dir: './glance-test' });
@@ -50,8 +51,21 @@ function testDirList() {
   http.get('http://localhost:16661/', function (res) {
     assert.equal(res.statusCode, 403);
     res.on('data', function () {});
-    res.on('end', testMethod);
+    res.on('end', testIndices);
   });
+}
+function testIndices() {
+  var data = []
+  glanceServer.indexing = true
+  glanceServer.indices = ['index.html']
+  http.get('http://localhost:16661/', function (res) {
+    assert.equal(res.statusCode, 200)
+    res.on('data', data.push.bind(data))
+    res.on('end', function () {
+      assert.equal(data.join(''), 'wee')
+      testMethod()
+    })
+  })
 }
 function testMethod() {
   ['POST', 'DELETE', 'PUT'].forEach(function (method) {
@@ -74,6 +88,7 @@ function testMethod() {
 function tearDown() {
   glanceServer.stop();
   fs.unlinkSync('glance-test/file.txt');
+  fs.unlinkSync('glance-test/index.html');
   fs.unlinkSync('glance-test/file with space.html');
   fs.rmdirSync('glance-test');
 }

@@ -44,4 +44,3 @@ if (c.port !== undefined) cliOptions.port = c.port
 if (c.verbose !== undefined) cliOptions.verbose = c.verbose
 
 new Glance(cliOptions).start()
-

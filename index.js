@@ -17,7 +17,6 @@ var fs = require('fs'),
       nodot: false
     }
 function Glance(options) {
-  
   if (!(this instanceof Glance)) return new Glance(options)
 
   options = xtend(defaults, options || {})
@@ -29,7 +28,7 @@ function Glance(options) {
   this.verbose = options.verbose
   this.nodot = options.nodot
 
-  if (!this.dir.match(/^\//)) this.dir = path.normalize(this.dir)
+  this.dir = path.normalize(this.dir)
 
   return this
 }
@@ -49,7 +48,7 @@ Glance.prototype.start = function () {
   })
 
   this.server = http.createServer(this.serveRequest.bind(this))
-    .listen(this.port);
+    .listen(this.port)
 
   if (this.verbose) colorConsole.log(['#magenta[glance] ',
     'serving #bold[', this.dir, '] on port #green[', this.port, ']'].join(''))
@@ -86,8 +85,9 @@ Glance.prototype.serveRequest = function (req, res) {
       }
       var listPath = request.fullPath.replace(/\/$/, '')
       res.writeHead(200, { 'Content-Type': 'text/html' })
-      htmlls(listPath, { hideDot: this.nodot }).pipe(res);
-      return this.emit('read', request);
+      htmlls(listPath, { hideDot: this.nodot }).pipe(res)
+
+      return this.emit('read', request)
     }
     this.emit('read', request)
     

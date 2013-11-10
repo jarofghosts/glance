@@ -16,6 +16,7 @@ var fs = require('fs'),
       verbose: false,
       nodot: false
     }
+
 function Glance(options) {
   if (!(this instanceof Glance)) return new Glance(options)
 

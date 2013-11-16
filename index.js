@@ -40,7 +40,7 @@ Glance.prototype.start = function () {
   this.on('error', function (errorCode, request) {
     if (this.verbose) colorConsole.log(['#red[ERR', errorCode, '] ',
       request.ip, ' on #bold[', request.fullPath, ']'].join(''))
-    showError(errorCode, request.response);
+    showError(errorCode, request.response)
   })
 
   this.on('read', function (request) {

@@ -17,6 +17,8 @@ var fs = require('fs'),
       nodot: false
     }
 
+module.exports.Glance = Glance
+
 function Glance(options) {
   if (!(this instanceof Glance)) return new Glance(options)
 
@@ -25,28 +27,18 @@ function Glance(options) {
   this.port = options.port
   this.indexing = options.indexing
   this.indices = options.indices
-  this.dir = options.dir
+  this.dir = path.normalize(options.dir)
   this.verbose = options.verbose
   this.nodot = options.nodot
-
-  this.dir = path.normalize(this.dir)
 
   return this
 }
 
-util.inherits(Glance, EventEmitter);
+util.inherits(Glance, EventEmitter)
 
-Glance.prototype.start = function () {
-  this.on('error', function (errorCode, request) {
-    if (this.verbose) colorConsole.log(['#red[ERR', errorCode, '] ',
-      request.ip, ' on #bold[', request.fullPath, ']'].join(''))
-    showError(errorCode, request.response)
-  })
-
-  this.on('read', function (request) {
-    if (this.verbose) colorConsole.log(['#green[INFO] ', request.ip,
-      ' read #bold[', request.fullPath, ']'].join(''))
-  })
+Glance.prototype.start = function startGlance() {
+  this.on('error', on_error)
+  this.on('read', on_read)
 
   this.server = http.createServer(this.serveRequest.bind(this))
     .listen(this.port)
@@ -54,49 +46,76 @@ Glance.prototype.start = function () {
   if (this.verbose) colorConsole.log(['#magenta[glance] ',
     'serving #bold[', this.dir, '] on port #green[', this.port, ']'].join(''))
 
+  function on_read(request) {
+    if (this.verbose) colorConsole.log(['#green[INFO] ', request.ip,
+      ' read #bold[', request.fullPath, ']'].join(''))
+  }
+
+  function on_error(errorCode, request) {
+    if (this.verbose) colorConsole.log(['#red[ERR', errorCode, '] ',
+      request.ip, ' on #bold[', request.fullPath, ']'].join(''))
+    showError(errorCode, request.response)
+  }
+
 }
 
-Glance.prototype.stop = function () {
+Glance.prototype.stop = function stopGlance() {
   this.server && this.server.close()
 }
 
-Glance.prototype.serveRequest = function (req, res) {
-  var request = {
-      fullPath: path.join(this.dir,
-        decodeURIComponent(parse(req.url).pathname)),
-      ip: req.socket.remoteAddress,
-      method: req.method.toLowerCase(),
-      response: res
+Glance.prototype.serveRequest = function glanceRequest(req, res) {
+  var self = this,
+      request = {}
+
+  request.fullPath = path.join(
+    self.dir,
+    decodeURIComponent(parse(req.url).pathname)
+  )
+  request.ip = req.socket.remoteAddress
+  request.method = req.method.toLowerCase()
+  request.response = res
+
+  if (request.method !== 'get') return self.emit('error', 405, request)
+  if (self.nodot && /^\./.test(path.basename(request.fullPath))) {
+    return self.emit('error', 404, request)
   }
-  if (request.method != 'get') return this.emit('error', 405, request)
-  if (this.nodot && /^\./.test(path.basename(request.fullPath))) {
-    return this.emit('error', 404, request)
-  }
-  fs.stat(request.fullPath, function (err, stat) {
-    if (err) return this.emit('error', 404, request)
-    if (stat.isDirectory()) {
-      if (!this.indexing) return this.emit('error', 403, request)
-      if (this.indices && this.indices.length) {
-        for (var i = 0, l = this.indices.length; i < l; ++i) {
-          if (fs.existsSync(path.join(request.fullPath, this.indices[i]))) {
-            req.url = path.join(req.url, this.indices[i])
-            return this.serveRequest(req, res)
-          }
+  fs.stat(request.fullPath, stat_file)
+
+  function stat_file(err, stat) {
+    if (err) return self.emit('error', 404, request)
+    if (!stat.isDirectory()) {
+      self.emit('read', request)
+      
+      res.writeHead(200, { 'Content-Type': mime.lookup(request.fullPath) })
+      return fs.createReadStream(request.fullPath).pipe(res)
+    }
+
+    if (!self.indexing) return self.emit('error', 403, request)
+    if (!self.indices || !self.indices.length) return list_files()
+
+    var indices = self.indices.slice()
+
+    !function find_index(index_test) {
+      fs.exists(path.join(request.fullPath, index_test), check)
+      function check(has_index) {
+        if (has_index) {
+          req.url = path.join(req.url, index_test)
+          return self.serveRequest(req, res)
         }
+
+        if (!indices.length) return list_files()
+        find_index(indices.shift())
       }
+    }(indices.shift())
+
+    function list_files() {
       var listPath = request.fullPath.replace(/\/$/, '')
       res.writeHead(200, { 'Content-Type': 'text/html' })
-      htmlls(listPath, { hideDot: this.nodot }).pipe(res)
+      htmlls(listPath, { hideDot: self.nodot }).pipe(res)
 
-      return this.emit('read', request)
+      return self.emit('read', request)
     }
-    this.emit('read', request)
-    
-    res.writeHead(200, { 'Content-Type': mime.lookup(request.fullPath) })
-    fs.createReadStream(request.fullPath).pipe(res)
-  
-  }.bind(this))
-
+  }
 }
 
 function showError(errorCode, res) {
@@ -104,8 +123,6 @@ function showError(errorCode, res) {
   fs.createReadStream(__dirname + '/errors/' + errorCode + '.html').pipe(res)
 }
 
-module.exports.createGlance = function (options) {
+module.exports.createGlance = function createGlance(options) {
   return new Glance(options)
 }
-
-module.exports.Glance = Glance

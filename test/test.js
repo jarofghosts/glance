@@ -1,94 +1,84 @@
 var assert = require('assert'),
     fs = require('fs'),
     glance = require('../index.js'),
-    http = require('http');
+    http = require('http')
 
-fs.mkdirSync('glance-test');
-fs.writeFileSync('glance-test/file.txt', 'howdy!');
-fs.writeFileSync('glance-test/index.html', 'wee');
-fs.writeFileSync('glance-test/file with space.html', 'hey, now!');
-
-var glanceServer = glance.createGlance({ port: 16661, dir: './glance-test' });
+var glanceServer = glance.createGlance({ port: 1666, dir: './glance-test' })
 
 assert.doesNotThrow(function () {
   glanceServer.start()
-});
+})
 
-http.get('http://localhost:16661/file.txt', function (res) {
-  var text = '';
-  assert.equal(res.statusCode, 200);
-  assert.equal(res.headers['content-type'], 'text/plain');
+http.get('http://localhost:1666/file.txt', function (res) {
+  var text = ''
+  assert.equal(res.statusCode, 200)
+  assert.equal(res.headers['content-type'], 'text/plain')
   res.on('data', function (data) {
-    text += data;
-  });
+    text += data
+  })
   res.on('end', function () {
     assert.equal(text, 'howdy!');
-    testUri();
-  });
-});
+    testUri()
+  })
+})
+
 function testUri() {
-  http.get('http://localhost:16661/file%20with%20space.html', function (res) {
-    var uritext = '';
-    assert.equal(res.statusCode, 200);
-    assert.equal(res.headers['content-type'], 'text/html');
+  http.get('http://localhost:1666/file%20with%20space.html', function (res) {
+    var uritext = ''
+    assert.equal(res.statusCode, 200)
+    assert.equal(res.headers['content-type'], 'text/html')
     res.on('data', function (data) {
-      uritext += data;
-    });
+      uritext += data
+    })
     res.on('end', function () {
-      assert.equal(uritext, 'hey, now!');
-      testError();
-    });
-  });
+      assert.equal(uritext, 'hey, now!')
+      testError()
+    })
+  })
 }
+
 function testError() {
-  http.get('http://localhost:16661/nofile.md', function (res) {
-    assert.equal(res.statusCode, 404);
-    res.on('data', function (data) {})
-    res.on('end', testDirList);
-  });
+  http.get('http://localhost:1666/nofile.md', function (res) {
+    assert.equal(res.statusCode, 404)
+    testDirList()
+  })
 }
 function testDirList() {
-  http.get('http://localhost:16661/', function (res) {
-    assert.equal(res.statusCode, 403);
-    res.on('data', function () {});
-    res.on('end', testIndices);
-  });
+  http.get('http://localhost:1666/', function (res) {
+    assert.equal(res.statusCode, 403)
+    testIndices()
+  })
 }
 function testIndices() {
   var data = []
   glanceServer.indexing = true
   glanceServer.indices = ['index.html']
-  http.get('http://localhost:16661/', function (res) {
+
+  http.get('http://localhost:1666/', function (res) {
     assert.equal(res.statusCode, 200)
     res.on('data', data.push.bind(data))
     res.on('end', function () {
-      assert.equal(data.join(''), 'wee')
+      assert.equal(data.join(''), 'wee\n')
       testMethod()
     })
   })
 }
 function testMethod() {
-  ['POST', 'DELETE', 'PUT'].forEach(function (method) {
+  var pass = 0
+  ;['POST', 'DELETE', 'PUT'].forEach(function (method) {
     var req = http.request({
       host: 'localhost',
-      port: 16661,
+      port: 1666,
       path: '/file.txt',
       method: method
     }, function (res) {
-      assert.equal(res.statusCode, 405);
-      res.on('data', function () {});
-    });
-    req.on('error', function (e) {
-      console.log(e);
-    });
-    req.end();
-  });
-  setTimeout(tearDown, 500);
-}
-function tearDown() {
-  glanceServer.stop();
-  fs.unlinkSync('glance-test/file.txt');
-  fs.unlinkSync('glance-test/index.html');
-  fs.unlinkSync('glance-test/file with space.html');
-  fs.rmdirSync('glance-test');
+      pass++
+      assert.equal(res.statusCode, 405)
+      if (pass == 3) {
+        glanceServer.stop()
+        process.exit(0)
+      }
+    })
+    req.end()
+  })
 }

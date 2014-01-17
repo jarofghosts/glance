@@ -29,7 +29,7 @@
   "dependencies": {
     "commander": "~1.2.0",
     "mime": "~1.2.9",
-    "html-ls": "0.1.0",
+    "html-ls": "0.1.1",
     "colorize": "~0.1.0",
     "xtend": "~2.0.6"
   }

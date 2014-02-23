@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
-var Glance = require('../').Glance,
+var glance = require('../'),
+    Glance = glance.Glance,
+    defaults = glance.defaults,
     c = require('commander'),
     path = require('path'),
     globalConfigFile = path.join(

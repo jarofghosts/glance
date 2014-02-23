@@ -18,6 +18,7 @@ var fs = require('fs'),
     }
 
 module.exports.Glance = Glance
+module.exports.defaults = defaults
 
 function Glance(options) {
   if (!(this instanceof Glance)) return new Glance(options)

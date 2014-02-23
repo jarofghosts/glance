@@ -1,9 +1,9 @@
-glance.js
+glance
 ===
 
 [![Build Status](https://travis-ci.org/jarofghosts/glance.png?branch=master)](https://travis-ci.org/jarofghosts/glance)
 
-Glance provides a quick disposable http server for static files
+a quick disposable http server for static files
 
 ## installation
 

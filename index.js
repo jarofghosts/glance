@@ -1,22 +1,25 @@
-var fs = require('fs'),
-    xtend = require('xtend'),
-    mime = require('mime'),
-    parse = require('url').parse,
-    http = require('http'),
-    EventEmitter = require('events').EventEmitter,
-    util = require('util'),
-    path = require('path'),
-    colorConsole = require('colorize').console,
-    htmlls = require('html-ls'),
-    defaults = {
-      port: 61403,
-      indexing: false,
-      indices: [],
-      dir: process.cwd(),
-      verbose: false,
-      nodot: false
-    }
+var EE = require('events').EventEmitter
+  , parse = require('url').parse
+  , http = require('http')
+  , util = require('util')
+  , path = require('path')
+  , fs = require('fs')
 
+var color_console = require('colorize').console
+  , htmlls = require('html-ls')
+  , xtend = require('xtend')
+  , mime = require('mime')
+
+var defaults = {
+    port: 61403
+  , indexing: false
+  , indices: []
+  , dir: process.cwd()
+  , verbose: false
+  , nodot: false
+}
+
+module.exports.createGlance = createGlance 
 module.exports.Glance = Glance
 module.exports.defaults = defaults
 
@@ -35,51 +38,65 @@ function Glance(options) {
   return this
 }
 
-util.inherits(Glance, EventEmitter)
+util.inherits(Glance, EE)
 
-Glance.prototype.start = function startGlance() {
+Glance.prototype.start = function Glance$start() {
   this.on('error', on_error)
   this.on('read', on_read)
 
   this.server = http.createServer(this.serveRequest.bind(this))
     .listen(this.port)
 
-  if (this.verbose) colorConsole.log(['#magenta[glance] ',
-    'serving #bold[', this.dir, '] on port #green[', this.port, ']'].join(''))
+  if (this.verbose) {
+    color_console.log(
+        '#magenta[glance] serving #bold[' + this.dir + '] on port ' +
+        '#green[' + this.port + ']'
+    )
+  }
 
   function on_read(request) {
-    if (this.verbose) colorConsole.log(['#green[INFO] ', request.ip,
-      ' read #bold[', request.fullPath, ']'].join(''))
+    if (!this.verbose) return
+
+    color_console.log(
+       '#green[INFO] ' + request.ip + ' read #bold[' + request.fullPath + ']'
+    )
   }
 
   function on_error(errorCode, request) {
-    if (this.verbose) colorConsole.log(['#red[ERR', errorCode, '] ',
-      request.ip, ' on #bold[', request.fullPath, ']'].join(''))
     showError(errorCode, request.response)
-  }
 
+    if (!this.verbose) return
+
+    color_console.log(
+        '#red[ERR' + errorCode + '] ' + request.ip + ' on #bold[' +
+        request.fullPath + ']'
+    )
+  }
 }
 
-Glance.prototype.stop = function stopGlance() {
-  this.server && this.server.close()
+Glance.prototype.stop = function Glance$stop() {
+  if (this.server) this.server.close()
 }
 
 Glance.prototype.serveRequest = function glanceRequest(req, res) {
-  var self = this,
-      request = {}
+  var request = {}
+    , self = this
 
   request.fullPath = path.join(
-    self.dir,
-    decodeURIComponent(parse(req.url).pathname)
+      self.dir
+    , decodeURIComponent(parse(req.url).pathname)
   )
+
   request.ip = req.socket.remoteAddress
   request.method = req.method.toLowerCase()
   request.response = res
 
   if (request.method !== 'get') return self.emit('error', 405, request)
+
   if (self.nodot && /^\./.test(path.basename(request.fullPath))) {
     return self.emit('error', 404, request)
   }
+
   fs.stat(request.fullPath, stat_file)
 
   function stat_file(err, stat) {
@@ -87,7 +104,7 @@ Glance.prototype.serveRequest = function glanceRequest(req, res) {
     if (!stat.isDirectory()) {
       self.emit('read', request)
       
-      res.writeHead(200, { 'Content-Type': mime.lookup(request.fullPath) })
+      res.writeHead(200, {'content-type': mime.lookup(request.fullPath)})
       return fs.createReadStream(request.fullPath).pipe(res)
     }
 
@@ -111,8 +128,8 @@ Glance.prototype.serveRequest = function glanceRequest(req, res) {
 
     function list_files() {
       var listPath = request.fullPath.replace(/\/$/, '')
-      res.writeHead(200, { 'Content-Type': 'text/html' })
-      htmlls(listPath, { hideDot: self.nodot }).pipe(res)
+      res.writeHead(200, {'content-type': 'text/html'})
+      htmlls(listPath, {hideDot: self.nodot}).pipe(res)
 
       return self.emit('read', request)
     }
@@ -124,6 +141,6 @@ function showError(errorCode, res) {
   fs.createReadStream(__dirname + '/errors/' + errorCode + '.html').pipe(res)
 }
 
-module.exports.createGlance = function createGlance(options) {
+function createGlance(options) {
   return new Glance(options)
 }

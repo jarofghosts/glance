@@ -1,15 +1,17 @@
 #!/usr/bin/env node
 
-var glance = require('../'),
-    Glance = glance.Glance,
-    defaults = glance.defaults,
-    c = require('commander'),
-    path = require('path'),
-    globalConfigFile = path.join(
-      path.normalize(process.env.HOME || process.env.USERPROFILE),
-      '.glance.json'
-    ),
-    version = require('../package.json').version
+var glance = require('../')
+  , Glance = glance.Glance
+  , defaults = glance.defaults
+  , c = require('commander')
+  , path = require('path')
+
+var globalConfigFile = path.join(
+    path.normalize(process.env.HOME || process.env.USERPROFILE)
+  , '.glance.json'
+)
+
+var version = require('../package.json').version
 
 try {
   var globalConfig = require(globalConfigFile)

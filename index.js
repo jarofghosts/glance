@@ -9,7 +9,7 @@ var color = require('bash-color')
   , htmlls = require('html-ls')
   , filed = require('filed')
   , xtend = require('xtend')
-  , combinedStream = require('combined-stream');
+  , combinedStream = require('combined-stream')
 
 var defaults = {
     port: 61403
@@ -147,7 +147,7 @@ Glance.prototype.serveRequest = function glanceRequest(req, res) {
       var list_path = request.fullPath.replace(/\/$/, '')
       var output = combinedStream.create()
       res.writeHead(200, {'content-type': 'text/html;charset=utf-8'})
-      output.appened(
+      output.append(
         fs.createReadStream(
            path.join(__dirname, 'common', 'header.html')
         )
@@ -163,12 +163,12 @@ Glance.prototype.serveRequest = function glanceRequest(req, res) {
 function show_error(error_code, res) {
   var output = combinedStream.create()
   res.writeHead(error_code, {'content-type': 'text/html;charset=utf-8'})
-  output.appened(
+  output.append(
     fs.createReadStream(
         path.join(__dirname, 'common', 'header.html')
     )
   )
-  output.appened( 
+  output.append( 
     fs.createReadStream(
         path.join(__dirname, 'errors', error_code + '.html')
     )

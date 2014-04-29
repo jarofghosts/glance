@@ -9,7 +9,6 @@ var color = require('bash-color')
   , htmlls = require('html-ls')
   , filed = require('filed')
   , xtend = require('xtend')
-  , mime = require('mime')
 
 var defaults = {
     port: 61403

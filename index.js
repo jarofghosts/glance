@@ -9,6 +9,7 @@ var color = require('bash-color')
   , htmlls = require('html-ls')
   , filed = require('filed')
   , xtend = require('xtend')
+  , combinedStream = require('combined-stream');
 
 var defaults = {
     port: 61403
@@ -144,9 +145,15 @@ Glance.prototype.serveRequest = function glanceRequest(req, res) {
 
     function list_files() {
       var list_path = request.fullPath.replace(/\/$/, '')
-
+      var output = combinedStream.create()
       res.writeHead(200, {'content-type': 'text/html;charset=utf-8'})
-      htmlls(list_path, {hideDot: self.nodot}).pipe(res)
+      output.appened(
+        fs.createReadStream(
+           path.join(__dirname, 'common', 'header.html')
+        )
+      ) 
+      output.append(htmlls(list_path, {hideDot: self.nodot}))
+      output.pipe(res)
 
       return self.emit('read', request)
     }
@@ -154,10 +161,19 @@ Glance.prototype.serveRequest = function glanceRequest(req, res) {
 }
 
 function show_error(error_code, res) {
+  var output = combinedStream.create()
   res.writeHead(error_code, {'content-type': 'text/html;charset=utf-8'})
-  fs.createReadStream(
-      path.join(__dirname, 'errors', error_code + '.html')
-  ).pipe(res)
+  output.appened(
+    fs.createReadStream(
+        path.join(__dirname, 'common', 'header.html')
+    )
+  )
+  output.appened( 
+    fs.createReadStream(
+        path.join(__dirname, 'errors', error_code + '.html')
+    )
+  )
+  output.pipe(res)
 }
 
 function createGlance(options) {

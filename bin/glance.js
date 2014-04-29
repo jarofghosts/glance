@@ -1,50 +1,71 @@
 #!/usr/bin/env node
 
-var glance = require('../')
-  , Glance = glance.Glance
-  , defaults = glance.defaults
-  , c = require('commander')
-  , path = require('path')
+var path = require('path')
+  , fs = require('fs')
 
-var globalConfigFile = path.join(
+var xtend = require('xtend')
+  , nopt = require('nopt')
+
+var glance = require('../')
+
+var Glance = glance.Glance
+  , defaults = glance.defaults
+
+var global_configFile = path.join(
     path.normalize(process.env.HOME || process.env.USERPROFILE)
   , '.glance.json'
 )
 
-var version = require('../package.json').version
+var noptions = {
+    dir: String
+  , indexing: Boolean
+  , indices: String
+  , nodot: Boolean
+  , port: Number
+  , verbose: Boolean
+  , help: Boolean
+  , version: Boolean
+}
+
+var shorts = {
+    d: ['--dir']
+  , i: ['--indexing']
+  , I: ['--indices']
+  , n: ['--nodot']
+  , p: ['--port']
+  , v: ['--verbose']
+  , h: ['--help']
+  , V: ['--version']
+}
+
+var glance_version = require('../package.json').version
 
 try {
-  var globalConfig = require(globalConfigFile)
-  defaults = xtend(defaults, globalConfig)
+  var global_config = require(globalConfigFile)
+  defaults = xtend(defaults, global_config)
 } catch (e) {}
 try {
-  var localConfig = require(path.join(process.cwd(), '.glance.json'))
-  defaults = xtend(defaults, localConfig)
+  var local_config = require(path.join(process.cwd(), '.glance.json'))
+  defaults = xtend(defaults, local_config)
 } catch (e) {}
 
-c
-  .version(version)
-  .option('-d, --dir [dirname]',
-      'serve files from [dirname] | default cwd')
-  .option('-i, --indexing',
-      'turn on autoindexing for directory requests | default off')
-  .option('-I, --indices <files>',
-      'comma-separated list of files considered as an "index"')
-  .option('-n, --nodot',
-      'do not list or serve dotfiles | default off')
-  .option('-p, --port [num]',
-      'serve on port [num] | default 61403', parseInt)
-  .option('-v, --verbose',
-      'log connections to console | default off')
-  .parse(process.argv)
+var options = nopt(noptions, shorts, process.argv)
 
-var cliOptions = {}
+if(options.help) return help()
+if(options.version) return version()
 
-if (c.dir !== undefined) cliOptions.dir = c.dir
-if (c.indexing !== undefined) cliOptions.indexing = c.indexing
-if (c.indices !== undefined) cliOptions.indices = c.indices.split(',')
-if (c.nodot !== undefined) cliOptions.nodot = c.nodot
-if (c.port !== undefined) cliOptions.port = c.port
-if (c.verbose !== undefined) cliOptions.verbose = c.verbose
+if(options.indices) options.indices = options.indices.split(',')
 
-new Glance(cliOptions).start()
+options = xtend(defaults, options)
+
+new Glance(options).start()
+
+function help() {
+  version()
+  fs.createReadStream(path.join(__dirname, '..', 'help.txt'))
+    .pipe(process.stdout)
+}
+
+function version() {
+  console.log('glance version ' + glance_version)
+}

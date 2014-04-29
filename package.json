@@ -27,10 +27,13 @@
   },
   "preferGlobal": true,
   "dependencies": {
-    "commander": "1.2.0",
-    "mime": "1.2.9",
     "html-ls": "0.1.1",
-    "colorize": "0.1.0",
-    "xtend": "2.0.6"
+    "xtend": "2.0.6",
+    "bash-color": "0.0.3",
+    "nopt": "2.2.0",
+    "filed": "0.1.0"
+  },
+  "devDependencies": {
+    "tape": "2.12.3"
   }
 }

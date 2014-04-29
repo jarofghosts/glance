@@ -1,0 +1,11 @@
+===================================================================
+Usage: glance [options]
+
+Options are:
+--dir, -d <dirname>           | serve files from <dirname>
+--indexing, -i                | index directory requests
+--indices, -I <file[, file2]> | comma-separated index filenames
+--nodot, -n                   | do not list or serve dotfiles
+--port, -p <num>              | listen on port <num>, default 61403
+--verbose, -v                 | log connections to console
+

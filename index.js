@@ -152,6 +152,7 @@ Glance.prototype.serveRequest = function glanceRequest(req, res) {
            path.join(__dirname, 'common', 'header.html')
         )
       ) 
+      output.append('<h3>Index of ' + (list_path.replace(self.dir, '') || '/')  + ' </h3>')
       output.append(htmlls(list_path, {hideDot: self.nodot}))
       output.pipe(res)
 

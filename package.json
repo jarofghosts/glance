@@ -1,6 +1,6 @@
 {
   "name": "glance",
-  "version": "0.4.1",
+  "version": "1.0.0",
   "description": "disposable fileserver",
   "main": "index.js",
   "bin": {
@@ -27,7 +27,7 @@
   },
   "preferGlobal": true,
   "dependencies": {
-    "html-ls": "^1.0.0",
+    "html-ls": "1.0.0",
     "xtend": "2.0.6",
     "bash-color": "0.0.3",
     "nopt": "2.2.0",

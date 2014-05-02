@@ -27,13 +27,12 @@ Command line options will always override config file options.
 
 * `--dir, -d <dir>` serve `<dir>` instead of current directory
 * `--help, -h` print help screen with option listing
-* `--indexing, -i` serve a directory index when requested
+* `--hideindex, -H` don't serve directory listing
 * `--indices, -I` comma-separated file names to use as indices
 * `--nodot, -n` hide dot files
-* `--port, -p <port>` open server on `<port>` rather than 61403
+* `--port, -p <port>` open server on `<port>` rather than 8080
 * `--version, -V` print version information
 * `--verbose, -v` enable verbose mode, printing log to stdout
-
 
 ## config format
 
@@ -41,11 +40,11 @@ Your config should be valid json in the following format (shown with defaults):
 
 ```json
 {
-  "port": 61403,
-  "indexing": false,
+  "port": 8080
+  "hideindex": false,
   "dir": "/whatever/dir/you/are/in",
   "verbose": false,
-  "indices": [],
+  "indices": ["index.html", "index.htm"],
   "nodot": false
 }
 ```
@@ -62,14 +61,16 @@ Some sample code might just look something like this:
 var glance = require('glance'),
     http = require('http'),
 // init a glance object with custom options (all totally optional)
-    g = createGlance({
-      dir: '../Files', // defaults to current working dir
-      port: 86753, // defaults to 61403
-      indices: [], // use these file names to provide indices
-      indexing: true, // will provide a directory list when requested
-      nodot: true, // will hide dot files from lists and will not serve them
-      verbose: true // defaults to false
-    })
+    g
+
+g = createGlance({
+    dir: '../Files' // defaults to current working dir
+  , port: 86753 // defaults to 8080
+  , indices: [] // use these file names to provide indices
+  , hideindex: true // will not provide a directory list if requested
+  , nodot: true // will hide dot files from lists and will not serve them
+  , verbose: true // defaults to false
+})
 
 // pass requests to glance if you wanna
 http.createServer(function (req, res) {

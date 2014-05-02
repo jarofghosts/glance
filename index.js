@@ -12,9 +12,9 @@ var color = require('bash-color')
   , combinedStream = require('combined-stream')
 
 var defaults = {
-    port: 61403
-  , indexing: false
-  , indices: []
+    port: 8080
+  , hideindex: false
+  , indices: ['index.html', 'index.htm']
   , dir: process.cwd()
   , verbose: false
   , nodot: false
@@ -30,7 +30,7 @@ function Glance(options) {
   options = xtend(defaults, options || {})
 
   this.port = options.port
-  this.indexing = options.indexing
+  this.hideindex = options.hideindex
   this.indices = options.indices
   this.dir = path.normalize(options.dir)
   this.verbose = options.verbose
@@ -121,7 +121,7 @@ Glance.prototype.serveRequest = function glanceRequest(req, res) {
       return filed(request.fullPath).pipe(res)
     }
 
-    if(!self.indexing) return self.emit('error', 403, request)
+    if(self.hideindex) return self.emit('error', 403, request)
     if(!self.indices || !self.indices.length) return list_files()
 
     var indices = self.indices.slice()

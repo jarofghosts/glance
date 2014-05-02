@@ -7,7 +7,7 @@ var glance = require('../index.js')
 
 var glanceServer = glance.createGlance({port: 1666, dir: './test/glance-test'})
 
-test('doesnt explode immediately', function (t) {
+test('doesnt explode immediately', function(t) {
   t.plan(1)
 
   t.doesNotThrow(function () {
@@ -61,10 +61,13 @@ test('404s on file not found', function(t) {
   })
 })
 
-test('403s on dir list if not configured', function(t) {
+test('403s on dir list if configured', function(t) {
   t.plan(1)
 
+  glanceServer.hideindex = true
+
   http.get('http://localhost:1666/', function (res) {
+    glanceServer.hideindex = false
     t.strictEqual(res.statusCode, 403)
   })
 })
@@ -73,9 +76,6 @@ test('serves index page', function(t) {
   t.plan(2)
 
   var data = []
-
-  glanceServer.indexing = true
-  glanceServer.indices = ['index.html']
 
   http.get('http://localhost:1666/', function (res) {
     t.strictEqual(res.statusCode, 200)

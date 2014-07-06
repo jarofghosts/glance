@@ -3,9 +3,9 @@ var http = require('http')
 
 var test = require('tape')
 
-var glance = require('../index.js')
+var glance = require('../')
 
-var glanceServer = glance.createGlance({port: 1666, dir: './test/glance-test'})
+var glanceServer = glance({port: 1666, dir: './test/glance-test'})
 
 test('doesnt explode immediately', function(t) {
   t.plan(1)
@@ -91,9 +91,9 @@ test('serves index page', function(t) {
 test('405s on everything but GET', function(t) {
   t.plan(3)
 
-  var bad_methods = ['POST', 'DELETE', 'PUT']
+  var badMethods = ['POST', 'DELETE', 'PUT']
 
-  bad_methods.forEach(function(method) {
+  badMethods.forEach(function(method) {
     var options
       , req
     

@@ -1,15 +1,16 @@
 glance
-===
+====
 
-[![Build Status](https://travis-ci.org/jarofghosts/glance.png?branch=master)](https://travis-ci.org/jarofghosts/glance)
+[![Build Status](http://img.shields.io/travis/jarofghosts/glance.svg?style=flat)](https://travis-ci.org/jarofghosts/glance)
+[![npm install](http://img.shields.io/npm/dm/glance.svg?style=flat)](https://www.npmjs.org/package/glance)
 
 a quick disposable http server for static files
 
 ## installation
 
-``
+```bash
 npm install -g glance
-``
+```
 
 ## usage
 
@@ -52,18 +53,17 @@ Your config should be valid json in the following format (shown with defaults):
 ## as a module
 
 Alternatively, you can `require('glance')` and use it as a module within your
-own code. The glance module provides access to the Glance object as well as
-`createGlance`, a function to return a new `glance` object.
+own code.
 
 Some sample code might just look something like this:
 
-````js
-var glance = require('glance'),
-    http = require('http'),
-// init a glance object with custom options (all totally optional)
-    g
+```js
+var http = require('http')
 
-g = createGlance({
+var glance = require('glance')
+// init a glance object with custom options (all totally optional)
+
+var g = glance({
     dir: '../Files' // defaults to current working dir
   , port: 86753 // defaults to 8080
   , indices: [] // use these file names to provide indices
@@ -72,8 +72,8 @@ g = createGlance({
   , verbose: true // defaults to false
 })
 
-// pass requests to glance if you wanna
-http.createServer(function (req, res) {
+// just use glance to serve requests if you wanna
+http.createServer(function(req, res) {
   if (/^\/static\//.test(req.url)) return g.serveRequest(req, res)
   // pretend i do other stuff here...
 }).listen(5309)
@@ -82,23 +82,25 @@ http.createServer(function (req, res) {
 g.start()
 
 // listen for read events
-g.on('read', function (req) {
+g.on('read', function(req) {
   console.dir(req)
   /* req object of format:
-     { fullPath: 'requested path',
-       ip: 'remote ip address',
-       method: 'requested method',
-       response: 'response object' }
+    {
+        fullPath: 'requested path'
+      , ip: 'remote ip address'
+      , method: 'requested method'
+      , response: 'response object'
+    }
   */
 })
 
 // listen for error events
-g.on('error', function (req) {
+g.on('error', function(req) {
   console.log('BAD!!!!')
   // stop the glance server
   g.stop()
 })
-````
+```
 
 ## license
 

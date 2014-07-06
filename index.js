@@ -1,7 +1,6 @@
 var EE = require('events').EventEmitter
   , parse = require('url').parse
   , http = require('http')
-  , util = require('util')
   , path = require('path')
   , fs = require('fs')
 
@@ -10,21 +9,12 @@ var color = require('bash-color')
   , filed = require('filed')
   , xtend = require('xtend')
 
-var defaults = {
-    port: 8080
-  , hideindex: false
-  , indices: ['index.html', 'index.htm']
-  , dir: process.cwd()
-  , verbose: false
-  , nodot: false
-}
+var defaults = require('./lib/config')
 
-module.exports.createGlance = createGlance 
-module.exports.Glance = Glance
-module.exports.defaults = defaults
+module.exports = createGlance 
 
 function Glance(options) {
-  if(!(this instanceof Glance)) return new Glance(options)
+  EE.call(this)
 
   options = xtend(defaults, options || {})
 
@@ -38,25 +28,25 @@ function Glance(options) {
   return this
 }
 
-util.inherits(Glance, EE)
+Glance.prototype = Object.create(EE.prototype)
 
 Glance.prototype.start = function Glance$start() {
   var self = this
 
-  self.on('error', on_error)
-  self.on('read', on_read)
+  self.on('error', onError)
+  self.on('read', onRead)
 
   self.server = http.createServer(function(req, res) {
     self.serveRequest(req, res)
   })
 
-  self.server.listen(self.port, output_listening)
+  self.server.listen(self.port, outputListening)
 
   self.server.addListener('connection', function(con) {
     con.setTimeout(500)
   })
 
-  function output_listening() {
+  function outputListening() {
     if(!self.verbose) return
 
     console.log(
@@ -65,7 +55,7 @@ Glance.prototype.start = function Glance$start() {
     )
   }
 
-  function on_read(request) {
+  function onRead(request) {
     if(!self.verbose) return
 
     console.log(
@@ -74,8 +64,8 @@ Glance.prototype.start = function Glance$start() {
     )
   }
 
-  function on_error(errorCode, request) {
-    show_error(errorCode, request.response)
+  function onError(errorCode, request) {
+    showError(errorCode, request.response)
 
     if(!self.verbose) return
 
@@ -90,7 +80,7 @@ Glance.prototype.stop = function Glance$stop() {
   if(this.server) this.server.close()
 }
 
-Glance.prototype.serveRequest = function glanceRequest(req, res) {
+Glance.prototype.serveRequest = function Glance$serveRequest(req, res) {
   var request = {}
     , self = this
 
@@ -109,54 +99,53 @@ Glance.prototype.serveRequest = function glanceRequest(req, res) {
     return self.emit('error', 404, request)
   }
 
-  fs.stat(request.fullPath, stat_file)
+  fs.stat(request.fullPath, statFile)
 
-  function stat_file(err, stat) {
+  function statFile(err, stat) {
     if(err) return self.emit('error', 404, request)
     if(!stat.isDirectory()) {
       self.emit('read', request)
 
-      filed(request.fullPath).pipe(process.stdout)
       return filed(request.fullPath).pipe(res)
     }
 
     if(self.hideindex) return self.emit('error', 403, request)
-    if(!self.indices || !self.indices.length) return list_files()
+    if(!self.indices || !self.indices.length) return listFiles()
 
     var indices = self.indices.slice()
 
-    find_index(indices.shift())
+    findIndex(indices.shift())
 
-    function find_index(index_test) {
-      fs.exists(path.join(request.fullPath, index_test), check)
+    function findIndex(indexTest) {
+      fs.exists(path.join(request.fullPath, indexTest), check)
 
-      function check(has_index) {
-        if(has_index) {
-          req.url = path.join(req.url, index_test)
+      function check(hasIndex) {
+        if(hasIndex) {
+          req.url = req.url + '/' + indexTest
 
           return self.serveRequest(req, res)
         }
 
-        if(!indices.length) return list_files()
-        find_index(indices.shift())
+        if(!indices.length) return listFiles()
+        findIndex(indices.shift())
       }
     }
 
-    function list_files() {
-      var list_path = request.fullPath.replace(/\/$/, '')
+    function listFiles() {
+      var listPath = request.fullPath.replace(/\/$/, '')
 
       res.writeHead(200, {'content-type': 'text/html;charset=utf-8'})
-      htmlls(list_path, {hideDot: self.nodot}).pipe(res)
+      htmlls(listPath, {hideDot: self.nodot}).pipe(res)
 
       return self.emit('read', request)
     }
   }
 }
 
-function show_error(error_code, res) {
-  res.writeHead(error_code, {'content-type': 'text/html;charset=utf-8'})
+function showError(errorCode, res) {
+  res.writeHead(errorCode, {'content-type': 'text/html;charset=utf-8'})
   fs.createReadStream(
-      path.join(__dirname, 'errors', error_code + '.html')
+      path.join(__dirname, 'errors', errorCode + '.html')
   ).pipe(res)
 }
 

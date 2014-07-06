@@ -7,7 +7,7 @@
     "glance": "./bin/glance.js"
   },
   "scripts": {
-    "test": "node test/test.js"
+    "test": "node test/index.js"
   },
   "repository": {
     "type": "git",
@@ -27,13 +27,13 @@
   },
   "preferGlobal": true,
   "dependencies": {
-    "html-ls": "1.0.0",
-    "xtend": "2.0.6",
     "bash-color": "0.0.3",
-    "nopt": "2.2.0",
-    "filed": "0.1.0"
+    "filed": "^0.1.0",
+    "html-ls": "^1.0.0",
+    "nopt": "^2.2.0",
+    "xtend": "^2.0.6"
   },
   "devDependencies": {
-    "tape": "2.12.3"
+    "tape": "^2.13.3"
   }
 }

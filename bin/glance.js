@@ -6,12 +6,10 @@ var path = require('path')
 var xtend = require('xtend')
   , nopt = require('nopt')
 
-var glance = require('../')
+var defaults = require('../lib/config')
+  , Glance = require('../')
 
-var Glance = glance.Glance
-  , defaults = glance.defaults
-
-var global_configFile = path.join(
+var globalConfigFile = path.join(
     path.normalize(process.env.HOME || process.env.USERPROFILE)
   , '.glance.json'
 )
@@ -38,15 +36,15 @@ var shorts = {
   , V: ['--version']
 }
 
-var glance_version = require('../package.json').version
+var glanceVersion = require('../package.json').version
 
 try {
-  var global_config = require(globalConfigFile)
-  defaults = xtend(defaults, global_config)
+  var globalConfig = require(globalConfigFile)
+  defaults = xtend(defaults, globalConfig)
 } catch (e) {}
 try {
-  var local_config = require(path.join(process.cwd(), '.glance.json'))
-  defaults = xtend(defaults, local_config)
+  var localConfig = require(path.join(process.cwd(), '.glance.json'))
+  defaults = xtend(defaults, localConfig)
 } catch (e) {}
 
 var options = nopt(noptions, shorts, process.argv)
@@ -63,9 +61,9 @@ new Glance(options).start()
 function help() {
   version()
   fs.createReadStream(path.join(__dirname, '..', 'help.txt'))
-    .pipe(process.stdout)
+    .pipe(process.stderr)
 }
 
 function version() {
-  console.log('glance version ' + glance_version)
+  console.log('glance version ' + glanceVersion)
 }

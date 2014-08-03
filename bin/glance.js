@@ -3,7 +3,8 @@
 var path = require('path')
   , fs = require('fs')
 
-var xtend = require('xtend')
+var color = require('bash-color')
+  , xtend = require('xtend')
   , nopt = require('nopt')
 
 var defaults = require('../lib/config')
@@ -13,6 +14,8 @@ var globalConfigFile = path.join(
     path.normalize(process.env.HOME || process.env.USERPROFILE)
   , '.glance.json'
 )
+
+var glance
 
 var noptions = {
     dir: String
@@ -56,7 +59,38 @@ if(options.indices) options.indices = options.indices.split(',')
 
 options = xtend(defaults, options)
 
-new Glance(options).start()
+glance = new Glance(options).start()
+
+glance.on('read', onRead)
+glance.on('error', onError)
+glance.on('started', onStarted)
+
+function onStarted() {
+  if(!options.verbose) return
+
+  console.log(
+      color.purple('glance') + ' serving ' + color.yellow(self.dir, true) +
+      ' on port ' + color.green(self.port)
+  )
+}
+
+function onRead(request) {
+  if(!self.options) return
+
+  console.log(
+     color.green(request.ip) + ' read ' +
+     color.yellow(request.fullPath, true)
+  )
+}
+
+function onError(errorCode, request) {
+  if(!options.verbose) return
+
+  console.log(
+      color.red('ERR' + errorCode) + ' ' + request.ip + ' on ' + 
+      color.yellow(request.fullPath, true)
+  )
+}
 
 function help() {
   version()

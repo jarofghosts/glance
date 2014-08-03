@@ -4,8 +4,7 @@ var EE = require('events').EventEmitter
   , path = require('path')
   , fs = require('fs')
 
-var color = require('bash-color')
-  , htmlls = require('html-ls')
+var htmlls = require('html-ls')
   , filed = require('filed')
   , xtend = require('xtend')
 
@@ -22,7 +21,6 @@ function Glance(options) {
   this.hideindex = options.hideindex
   this.indices = options.indices
   this.dir = path.normalize(options.dir)
-  this.verbose = options.verbose
   this.nodot = options.nodot
 
   return this
@@ -33,46 +31,20 @@ Glance.prototype = Object.create(EE.prototype)
 Glance.prototype.start = function Glance$start() {
   var self = this
 
-  self.on('error', onError)
-  self.on('read', onRead)
-
   self.server = http.createServer(function(req, res) {
     self.serveRequest(req, res)
   })
 
-  self.server.listen(self.port, outputListening)
+  self.server.listen(self.port, emitStarted)
 
   self.server.addListener('connection', function(con) {
     con.setTimeout(500)
   })
 
-  function outputListening() {
-    if(!self.verbose) return
+  self.on('error', showError)
 
-    console.log(
-        color.purple('glance') + ' serving ' + color.yellow(self.dir, true) +
-        ' on port ' + color.green(self.port)
-    )
-  }
-
-  function onRead(request) {
-    if(!self.verbose) return
-
-    console.log(
-       color.green(request.ip) + ' read ' +
-       color.yellow(request.fullPath, true)
-    )
-  }
-
-  function onError(errorCode, request) {
-    showError(errorCode, request.response)
-
-    if(!self.verbose) return
-
-    console.log(
-        color.red('ERR' + errorCode) + ' ' + request.ip + ' on ' + 
-        color.yellow(request.fullPath, true)
-    )
+  function emitStarted() {
+    self.emit('started', self.server)
   }
 }
 
@@ -93,23 +65,23 @@ Glance.prototype.serveRequest = function Glance$serveRequest(req, res) {
   request.method = req.method.toLowerCase()
   request.response = res
 
-  if(request.method !== 'get') return self.emit('error', 405, request)
+  if(request.method !== 'get') return self.emit('error', 405, request, res)
 
   if(self.nodot && /^\./.test(path.basename(request.fullPath))) {
-    return self.emit('error', 404, request)
+    return self.emit('error', 404, request, res)
   }
 
   fs.stat(request.fullPath, statFile)
 
   function statFile(err, stat) {
-    if(err) return self.emit('error', 404, request)
+    if(err) return self.emit('error', 404, request, res)
     if(!stat.isDirectory()) {
       self.emit('read', request)
 
       return filed(request.fullPath).pipe(res)
     }
 
-    if(self.hideindex) return self.emit('error', 403, request)
+    if(self.hideindex) return self.emit('error', 403, request, res)
     if(!self.indices || !self.indices.length) return listFiles()
 
     var indices = self.indices.slice()
@@ -142,7 +114,7 @@ Glance.prototype.serveRequest = function Glance$serveRequest(req, res) {
   }
 }
 
-function showError(errorCode, res) {
+function showError(errorCode, req, res) {
   res.writeHead(errorCode, {'content-type': 'text/html;charset=utf-8'})
   fs.createReadStream(
       path.join(__dirname, 'errors', errorCode + '.html')

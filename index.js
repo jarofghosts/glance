@@ -10,7 +10,9 @@ var htmlls = require('html-ls')
 
 var defaults = require('./lib/config')
 
-module.exports = createGlance 
+var RESPONSE_HEADERS = {'content-type': 'text/html;charset=utf-8'}
+
+module.exports = createGlance
 
 function Glance(options) {
   EE.call(this)
@@ -106,7 +108,7 @@ Glance.prototype.serveRequest = function Glance$serveRequest(req, res) {
     function listFiles() {
       var listPath = request.fullPath.replace(/\/$/, '')
 
-      res.writeHead(200, {'content-type': 'text/html;charset=utf-8'})
+      res.writeHead(200, RESPONSE_HEADERS)
       htmlls(listPath, {hideDot: self.nodot}).pipe(res)
 
       return self.emit('read', request)
@@ -115,7 +117,7 @@ Glance.prototype.serveRequest = function Glance$serveRequest(req, res) {
 }
 
 function showError(errorCode, req, res) {
-  res.writeHead(errorCode, {'content-type': 'text/html;charset=utf-8'})
+  res.writeHead(errorCode, RESPONSE_HEADERS)
   fs.createReadStream(
       path.join(__dirname, 'errors', errorCode + '.html')
   ).pipe(res)

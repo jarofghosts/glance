@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+var self = this;
+
 var path = require('path')
   , fs = require('fs')
 
@@ -59,7 +61,8 @@ if(options.indices) options.indices = options.indices.split(',')
 
 options = xtend(defaults, options)
 
-glance = new Glance(options).start()
+glance = new Glance(options);
+glance.start()
 
 glance.on('read', onRead)
 glance.on('error', onError)

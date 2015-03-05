@@ -59,7 +59,9 @@ if(options.indices) options.indices = options.indices.split(',')
 
 options = xtend(defaults, options)
 
-glance = new Glance(options).start()
+glance = new Glance(options)
+
+glance.start()
 
 glance.on('read', onRead)
 glance.on('error', onError)
@@ -69,13 +71,13 @@ function onStarted() {
   if(!options.verbose) return
 
   console.log(
-      color.purple('glance') + ' serving ' + color.yellow(self.dir, true) +
-      ' on port ' + color.green(self.port)
+      color.purple('glance') + ' serving ' + color.yellow(this.dir, true) +
+      ' on port ' + color.green(this.port)
   )
 }
 
 function onRead(request) {
-  if(!self.options) return
+  if(!this.options) return
 
   console.log(
      color.green(request.ip) + ' read ' +

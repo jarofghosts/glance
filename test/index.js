@@ -104,12 +104,12 @@ test('405s on everything but GET', function(t) {
       , method: method
     }
   
-    req = http.request(options, verify_code)
+    req = http.request(options, verifyCode)
 
     req.end()
   })
 
-  function verify_code(res) {
+  function verifyCode(res) {
     t.strictEqual(res.statusCode, 405)
   }
 })

@@ -1,5 +1,4 @@
-glance
-====
+# glance
 
 [![Build Status](http://img.shields.io/travis/jarofghosts/glance.svg?style=flat)](https://travis-ci.org/jarofghosts/glance)
 [![npm install](http://img.shields.io/npm/dm/glance.svg?style=flat)](https://www.npmjs.org/package/glance)
@@ -41,12 +40,12 @@ Your config should be valid json in the following format (shown with defaults):
 
 ```json
 {
-  "port": 8080
-  "hideindex": false,
-  "dir": "/whatever/dir/you/are/in",
-  "verbose": false,
-  "indices": ["index.html", "index.htm"],
-  "nodot": false
+    "port": 8080
+  , "hideindex": false
+  , "dir": "/whatever/dir/you/are/in"
+  , "verbose": false
+  , "indices": ["index.html", "index.htm"]
+  , "nodot": false
 }
 ```
 

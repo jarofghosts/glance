@@ -1,7 +1,10 @@
 # glance
 
-[![Build Status](http://img.shields.io/travis/jarofghosts/glance.svg?style=flat)](https://travis-ci.org/jarofghosts/glance)
-[![npm install](http://img.shields.io/npm/dm/glance.svg?style=flat)](https://www.npmjs.org/package/glance)
+[![Build Status](https://img.shields.io/travis/jarofghosts/glance.svg?style=flat-square)](https://travis-ci.org/jarofghosts/glance)
+[![npm install](https://img.shields.io/npm/dm/glance.svg?style=flat-square)](https://www.npmjs.org/package/glance)
+[![npm version](https://img.shields.io/npm/v/glance.svg?style=flat-square)](https://www.npmjs.org/package/glance)
+[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/feross/standard)
+[![License](https://img.shields.io/npm/l/glance.svg?style=flat-square)](https://github.com/jarofghosts/glance/blob/master/LICENSE)
 
 a quick disposable http server for static files
 
@@ -36,16 +39,16 @@ Command line options will always override config file options.
 
 ## config format
 
-Your config should be valid json in the following format (shown with defaults):
+Your config should be valid JSON in the following format (shown with defaults):
 
 ```json
 {
-    "port": 8080
-  , "hideindex": false
-  , "dir": "/whatever/dir/you/are/in"
-  , "verbose": false
-  , "indices": ["index.html", "index.htm"]
-  , "nodot": false
+  "port": 8080,
+  "hideindex": false,
+  "dir": "/whatever/dir/you/are/in",
+  "verbose": false,
+  "indices": ["index.html", "index.htm"],
+  "nodot": false
 }
 ```
 
@@ -63,17 +66,19 @@ var glance = require('glance')
 // init a glance object with custom options (all totally optional)
 
 var g = glance({
-    dir: '../Files' // defaults to current working dir
-  , port: 86753 // defaults to 8080
-  , indices: [] // use these file names to provide indices
-  , hideindex: true // will not provide a directory list if requested
-  , nodot: true // will hide dot files from lists and will not serve them
-  , verbose: true // defaults to false
+  dir: '../Files', // defaults to current working dir
+  port: 86753, // defaults to 8080
+  indices: [], // use these file names to provide indices
+  hideindex: true, // will not provide a directory list if requested
+  nodot: true, // will hide dot files from lists and will not serve them
+  verbose: true // defaults to false
 })
 
 // just use glance to serve requests if you wanna
-http.createServer(function(req, res) {
-  if (/^\/static\//.test(req.url)) return g.serveRequest(req, res)
+http.createServer(function (req, res) {
+  if (/^\/static\//.test(req.url)) {
+    return g.serveRequest(req, res)
+  }
   // pretend i do other stuff here...
 }).listen(5309)
 
@@ -81,7 +86,7 @@ http.createServer(function(req, res) {
 g.start()
 
 // listen for read events
-g.on('read', function(req) {
+g.on('read', function (req) {
   console.dir(req)
   /* req object of format:
     {
@@ -94,7 +99,7 @@ g.on('read', function(req) {
 })
 
 // listen for error events
-g.on('error', function(req) {
+g.on('error', function (req) {
   console.log('BAD!!!!')
   // stop the glance server
   g.stop()

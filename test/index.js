@@ -71,6 +71,14 @@ test('403s on dir list if configured', function (t) {
   })
 })
 
+test('403s if path traversal is attempted', function (t) {
+  t.plan(1)
+
+  http.get('http://localhost:1666/../index.js', function (res) {
+    t.strictEqual(res.statusCode, 403)
+  })
+})
+
 test('serves index page', function (t) {
   t.plan(2)
 

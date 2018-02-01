@@ -70,6 +70,11 @@ Glance.prototype.serveRequest = function Glance$serveRequest (req, res) {
   request.method = req.method.toLowerCase()
   request.response = res
 
+  // prevent traversing directories that are parents of the root
+  if (request.fullPath.slice(0, self.dir.length) !== self.dir) {
+    return self.emit('error', 403, request, res)
+  }
+
   if (request.method !== 'get') {
     return self.emit('error', 405, request, res)
   }

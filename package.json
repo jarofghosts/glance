@@ -31,6 +31,7 @@
     "bash-color": "0.0.3",
     "filed": "0.1.0",
     "html-ls": "1.0.0",
+    "mime": "1.2.6",
     "nopt": "3.0.4",
     "utils-fs-exists": "1.0.1",
     "xtend": "4.0.0"

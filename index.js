@@ -142,7 +142,7 @@ Glance.prototype.serveRequest = function Glance$serveRequest (req, res) {
 
       listing.on('end', function () {
         renderPage('Directory Listing', listingHtml, res)
-      }) 
+      })
 
       return self.emit('read', request)
     }
@@ -184,7 +184,7 @@ function errorTitle (errorCode) {
     '403': 'Forbidden',
     '405': 'Method Not Allowed',
     '500': 'Internal Server Error'
-  } 
+  }
   return mappings['' + errorCode]
 }
 

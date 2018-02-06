@@ -8,6 +8,7 @@ var fileExists = require('utils-fs-exists')
 var htmlls = require('html-ls')
 var filed = require('filed')
 var xtend = require('xtend')
+var replace = require('stream-replace')
 
 var defaults = require('./lib/config')
 
@@ -130,7 +131,19 @@ Glance.prototype.serveRequest = function Glance$serveRequest (req, res) {
       var listPath = request.fullPath.replace(/\/$/, '')
 
       res.writeHead(200, RESPONSE_HEADERS)
-      htmlls(listPath, {hideDot: self.nodot}).pipe(res)
+
+      let listingHtml = '<h3>Directory Listing</h3>'
+
+      let listing = htmlls(listPath, {hideDot: self.nodot})
+
+      listing.on('data', function(buf){
+        listingHtml += buf.toString(); 
+      })
+
+      listing.on('end', function(){
+        console.log('end');
+        renderPage('Directory Listing', listingHtml, res);
+      }) 
 
       return self.emit('read', request)
     }
@@ -139,9 +152,41 @@ Glance.prototype.serveRequest = function Glance$serveRequest (req, res) {
 
 function showError (errorCode, req, res) {
   res.writeHead(errorCode, RESPONSE_HEADERS)
-  fs.createReadStream(
-      path.join(__dirname, 'errors', errorCode + '.html')
-  ).pipe(res)
+
+  let errorHtml = ''
+
+  let errorPage = fs.createReadStream(
+    path.join(__dirname, 'errors', errorCode + '.html')
+  )
+
+  errorPage.on('data', function(buf){
+    errorHtml += buf.toString();
+  })
+
+  errorPage.on('end', function(){
+    let title = errorTitle(errorCode)
+    renderPage(title, errorHtml, res);
+  })
+}
+
+function renderPage (title, body, res) {
+  let layout = fs.createReadStream(
+    path.join(__dirname, 'errors/shared/layout.html')
+  )
+  layout
+  .pipe(replace(/{{\s*title\s*}}/g, title))
+  .pipe(replace(/{{\s*body\s*}}/g, body))
+  .pipe(res)
+}
+
+function errorTitle (errorCode) {
+  let mappings = {
+    '404': 'File Not Found',
+    '403': 'Forbidden', 
+    '405': 'Method Not Allowed',
+    '500': 'Internal Server Error'
+  }  
+  return mappings['' + errorCode];
 }
 
 function createGlance (options) {

@@ -136,13 +136,12 @@ Glance.prototype.serveRequest = function Glance$serveRequest (req, res) {
 
       let listing = htmlls(listPath, {hideDot: self.nodot})
 
-      listing.on('data', function(buf){
-        listingHtml += buf.toString(); 
+      listing.on('data', function (buf) {
+        listingHtml += buf.toString()
       })
 
-      listing.on('end', function(){
-        console.log('end');
-        renderPage('Directory Listing', listingHtml, res);
+      listing.on('end', function () {
+        renderPage('Directory Listing', listingHtml, res)
       }) 
 
       return self.emit('read', request)
@@ -159,13 +158,13 @@ function showError (errorCode, req, res) {
     path.join(__dirname, 'errors', errorCode + '.html')
   )
 
-  errorPage.on('data', function(buf){
-    errorHtml += buf.toString();
+  errorPage.on('data', function (buf) {
+    errorHtml += buf.toString()
   })
 
-  errorPage.on('end', function(){
+  errorPage.on('end', function () {
     let title = errorTitle(errorCode)
-    renderPage(title, errorHtml, res);
+    renderPage(title, errorHtml, res)
   })
 }
 
@@ -182,11 +181,11 @@ function renderPage (title, body, res) {
 function errorTitle (errorCode) {
   let mappings = {
     '404': 'File Not Found',
-    '403': 'Forbidden', 
+    '403': 'Forbidden',
     '405': 'Method Not Allowed',
     '500': 'Internal Server Error'
-  }  
-  return mappings['' + errorCode];
+  } 
+  return mappings['' + errorCode]
 }
 
 function createGlance (options) {

@@ -132,9 +132,9 @@ Glance.prototype.serveRequest = function Glance$serveRequest (req, res) {
 
       res.writeHead(200, RESPONSE_HEADERS)
 
-      let listingHtml = '<h3>Directory Listing</h3>'
+      var listingHtml = '<h3>Directory Listing</h3>'
 
-      let listing = htmlls(listPath, {hideDot: self.nodot})
+      var listing = htmlls(listPath, {hideDot: self.nodot})
 
       listing.on('data', function (buf) {
         listingHtml += buf.toString()
@@ -152,9 +152,9 @@ Glance.prototype.serveRequest = function Glance$serveRequest (req, res) {
 function showError (errorCode, req, res) {
   res.writeHead(errorCode, RESPONSE_HEADERS)
 
-  let errorHtml = ''
+  var errorHtml = ''
 
-  let errorPage = fs.createReadStream(
+  var errorPage = fs.createReadStream(
     path.join(__dirname, 'errors', errorCode + '.html')
   )
 
@@ -163,13 +163,13 @@ function showError (errorCode, req, res) {
   })
 
   errorPage.on('end', function () {
-    let title = errorTitle(errorCode)
+    var title = errorTitle(errorCode)
     renderPage(title, errorHtml, res)
   })
 }
 
 function renderPage (title, body, res) {
-  let layout = fs.createReadStream(
+  var layout = fs.createReadStream(
     path.join(__dirname, 'errors/shared/layout.html')
   )
   layout
@@ -179,7 +179,7 @@ function renderPage (title, body, res) {
 }
 
 function errorTitle (errorCode) {
-  let mappings = {
+  var mappings = {
     '404': 'File Not Found',
     '403': 'Forbidden',
     '405': 'Method Not Allowed',

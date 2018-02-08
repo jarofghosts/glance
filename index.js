@@ -37,13 +37,13 @@ Glance.prototype.start = function Glance$start () {
   var self = this
   var _favicon
 
-  fs.stat('./favicon.ico', assignFavicon)
+  fs.stat(path.join(self.dir, 'favicon.ico'), assignFavicon)
 
   function assignFavicon (err, stat) {
     if (err) {
       _favicon = favicon(path.join(__dirname, 'public', 'favicon.ico'))
     } else {
-      _favicon = favicon('./favicon.ico')
+      _favicon = favicon(path.join(self.dir, 'favicon.ico'))
     }
 
     self.server = http.createServer(function (req, res) {

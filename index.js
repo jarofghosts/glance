@@ -185,7 +185,7 @@ function errorTitle (errorCode) {
     '405': 'Method Not Allowed',
     '500': 'Internal Server Error'
   }
-  return mappings['' + errorCode]
+  return mappings[errorCode.toString()]
 }
 
 function createGlance (options) {

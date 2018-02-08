@@ -33,7 +33,6 @@
     "html-ls": "1.0.0",
     "mime": "1.2.6",
     "nopt": "3.0.4",
-    "serve-favicon": "2.4.5",
     "stream-replace": "1.0.0",
     "utils-fs-exists": "1.0.1",
     "xtend": "4.0.0"

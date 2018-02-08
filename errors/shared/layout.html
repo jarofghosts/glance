@@ -1,0 +1,84 @@
+<html>
+	<head>
+		<title>{{ title }}</title>
+    <style>
+      body{
+        width: 100%;
+        min-height: 100vh;
+        margin: 0;
+        display: flex;
+        flex-direction:column;
+        justify-content: space-between;
+        align-items: center;
+        font: 15px helvetica,sans-serif;
+        text-align: center;
+        color: #3c3c3c;
+      }
+      h3{
+        color:#713d71;
+        font-weight: normal;
+        font-size:40px;
+        margin-bottom: 0;
+      }
+      .error-container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .main {
+        width: 60%; 
+        min-height: calc(100vh - 114px);
+        font-size: 18px;
+        align-items: flex-start;
+        display:flex; 
+        flex-direction:column;
+      }
+      .main ul {
+        list-style-type: none;
+        display:flex;
+        flex-direction:column;
+        align-items: flex-start;
+        margin: 1em 0;
+        padding: 0;
+      }
+      pre.code{
+        margin-right: 10px;
+        font-weight: bold;
+        float: left;
+        color: #544054;
+      }
+      pre.error{
+        font-size:12px;
+        float:left;
+        margin-left:10px;
+      }
+
+      .error-text {
+        display: flex;
+        align-items: center;
+      }
+      footer{
+        height: 114px;
+        display: flex;
+        align-items:center;
+        justify-content: center;
+        font-size:11px;
+        color:#6b6b6b;
+      }
+      a{ 
+        color: #904790;
+      }
+    </style>
+	</head>
+	<body>
+    <div class="main">
+      {{ body }} 
+    </div>
+    <footer>
+      <span>This page is powered by <a href="https://github.com/jarofghosts/glance">Glance</a></span>
+    </footer>    
+  </body>
+</html>    

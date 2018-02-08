@@ -35,13 +35,14 @@ Glance.prototype = Object.create(EE.prototype)
 
 Glance.prototype.start = function Glance$start () {
   var self = this
+  var _favicon
 
   fs.stat('./favicon.ico', assignFavicon)
-  
+
   function assignFavicon (err, stat) {
-    if (err) { 
+    if (err) {
       _favicon = favicon(path.join(__dirname, 'public', 'favicon.ico'))
-    }else{
+    } else {
       _favicon = favicon('./favicon.ico')
     }
 

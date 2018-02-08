@@ -3,6 +3,7 @@ var parse = require('url').parse
 var http = require('http')
 var path = require('path')
 var fs = require('fs')
+var favicon = require('serve-favicon')
 
 var fileExists = require('utils-fs-exists')
 var htmlls = require('html-ls')
@@ -35,20 +36,32 @@ Glance.prototype = Object.create(EE.prototype)
 Glance.prototype.start = function Glance$start () {
   var self = this
 
-  self.server = http.createServer(function (req, res) {
-    self.serveRequest(req, res)
-  })
+  fs.stat('./favicon.ico', assignFavicon)
+  
+  function assignFavicon (err, stat) {
+    if (err) { 
+      _favicon = favicon(path.join(__dirname, 'public', 'favicon.ico'))
+    }else{
+      _favicon = favicon('./favicon.ico')
+    }
 
-  self.server.listen(self.port, emitStarted)
+    self.server = http.createServer(function (req, res) {
+      _favicon(req, res, function () {
+        self.serveRequest(req, res)
+      })
+    })
 
-  self.server.addListener('connection', function (con) {
-    con.setTimeout(500)
-  })
+    self.server.listen(self.port, emitStarted)
 
-  self.on('error', showError)
+    self.server.addListener('connection', function (con) {
+      con.setTimeout(500)
+    })
 
-  function emitStarted () {
-    self.emit('started', self.server)
+    self.on('error', showError)
+
+    function emitStarted () {
+      self.emit('started', self.server)
+    }
   }
 }
 

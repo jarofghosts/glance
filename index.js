@@ -73,13 +73,6 @@ Glance.prototype.serveRequest = function Glance$serveRequest (req, res) {
   request.method = req.method.toLowerCase()
   request.response = res
 
-  // handle favicon
-  if (request.method === 'GET' && requestPath === '/favicon.ico') {
-    var faviconPath = path.join(self.dir, 'favicon.ico')
-
-    fs.stat(faviconPath, serveFavicon)
-  }
-
   // prevent traversing directories that are parents of the root
   if (request.fullPath.slice(0, self.dir.length) !== self.dir) {
     return self.emit('error', 403, request, res)
@@ -93,13 +86,19 @@ Glance.prototype.serveRequest = function Glance$serveRequest (req, res) {
     return self.emit('error', 404, request, res)
   }
 
-  fs.stat(request.fullPath, statFile)
+  var faviconPath = path.join(self.dir, 'favicon.ico')
+
+  if (request.method === 'get' && requestPath === '/favicon.ico') {
+    fs.stat(faviconPath, serveFavicon)
+  } else {
+    fs.stat(request.fullPath, statFile)
+  }
 
   function serveFavicon (err, stat) {
     if (err) {
       faviconPath = path.join(__dirname, 'public', 'favicon.ico')
     }
-    fs.createReadStream(faviconPath).pipe(res)
+    return fs.createReadStream(faviconPath).pipe(res)
   }
 
   function statFile (err, stat) {

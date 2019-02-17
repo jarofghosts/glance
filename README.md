@@ -3,7 +3,6 @@
 [![Build Status](https://img.shields.io/travis/jarofghosts/glance.svg?style=flat-square)](https://travis-ci.org/jarofghosts/glance)
 [![npm install](https://img.shields.io/npm/dm/glance.svg?style=flat-square)](https://www.npmjs.org/package/glance)
 [![npm version](https://img.shields.io/npm/v/glance.svg?style=flat-square)](https://www.npmjs.org/package/glance)
-[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/feross/standard)
 [![License](https://img.shields.io/npm/l/glance.svg?style=flat-square)](https://github.com/jarofghosts/glance/blob/master/LICENSE)
 
 a quick disposable http server for static files
@@ -28,14 +27,14 @@ Command line options will always override config file options.
 
 `glance [options]`
 
-* `--dir, -d <dir>` serve `<dir>` instead of current directory
-* `--help, -h` print help screen with option listing
-* `--hideindex, -H` don't serve directory listing
-* `--indices, -I` comma-separated file names to use as indices
-* `--nodot, -n` hide dot files
-* `--port, -p <port>` open server on `<port>` rather than 8080
-* `--version, -V` print version information
-* `--verbose, -v` enable verbose mode, printing log to stdout
+- `--dir, -d <dir>` serve `<dir>` instead of current directory
+- `--help, -h` print help screen with option listing
+- `--hideindex, -H` don't serve directory listing
+- `--indices, -I` comma-separated file names to use as indices
+- `--nodot, -n` hide dot files
+- `--port, -p <port>` open server on `<port>` rather than 8080
+- `--version, -V` print version information
+- `--verbose, -v` enable verbose mode, printing log to stdout
 
 ## config format
 
@@ -75,18 +74,20 @@ var g = glance({
 })
 
 // just use glance to serve requests if you wanna
-http.createServer(function (req, res) {
-  if (/^\/static\//.test(req.url)) {
-    return g.serveRequest(req, res)
-  }
-  // pretend i do other stuff here...
-}).listen(5309)
+http
+  .createServer(function(req, res) {
+    if (/^\/static\//.test(req.url)) {
+      return g.serveRequest(req, res)
+    }
+    // pretend i do other stuff here...
+  })
+  .listen(5309)
 
 // or, use it to start a static file server
 g.start()
 
 // listen for read events
-g.on('read', function (req) {
+g.on('read', function(req) {
   console.dir(req)
   /* req object of format:
     {
@@ -99,7 +100,7 @@ g.on('read', function (req) {
 })
 
 // listen for error events
-g.on('error', function (req) {
+g.on('error', function(req) {
   console.log('BAD!!!!')
   // stop the glance server
   g.stop()

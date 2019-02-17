@@ -14,44 +14,6 @@ test('doesnt explode immediately', function(t) {
   })
 })
 
-test('serves plaintext with headers', function(t) {
-  http.get('http://localhost:1666/file.txt', function(res) {
-    t.plan(3)
-
-    var text = ''
-
-    t.strictEqual(res.statusCode, 200)
-    t.strictEqual(res.headers['content-type'], 'text/plain')
-
-    res.on('data', function(data) {
-      text += data
-    })
-
-    res.on('end', function() {
-      t.strictEqual(text, 'howdy!')
-    })
-  })
-})
-
-test('deals with uri encoding', function(t) {
-  http.get('http://localhost:1666/file%20with%20space.html', function(res) {
-    t.plan(3)
-
-    var uritext = ''
-
-    t.strictEqual(res.statusCode, 200)
-    t.strictEqual(res.headers['content-type'], 'text/html')
-
-    res.on('data', function(data) {
-      uritext += data
-    })
-
-    res.on('end', function() {
-      t.strictEqual(uritext, 'hey, now!')
-    })
-  })
-})
-
 test('404s if dot dir with nodot', function(t) {
   t.plan(2)
 

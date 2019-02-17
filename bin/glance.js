@@ -47,7 +47,7 @@ if (require.main === module) {
 
 module.exports = bin
 
-function bin () {
+function bin() {
   try {
     var globalConfig = require(globalConfigFile)
     defaults = xtend(defaults, globalConfig)
@@ -84,33 +84,39 @@ function bin () {
   }
 }
 
-function onStarted () {
+function onStarted() {
   console.log(
-    color.purple('glance') + ' serving ' + color.yellow(this.dir, true) +
-    ' on port ' + color.green(this.port)
+    color.purple('glance') +
+      ' serving ' +
+      color.yellow(this.dir, true) +
+      ' on port ' +
+      color.green(this.port)
   )
 }
 
-function onRead (request) {
+function onRead(request) {
   console.log(
-    color.green(request.ip) + ' read ' +
-    color.yellow(request.fullPath, true)
+    color.green(request.ip) + ' read ' + color.yellow(request.fullPath, true)
   )
 }
 
-function onError (errorCode, request) {
+function onError(errorCode, request) {
   console.log(
-    color.red('ERR' + errorCode) + ' ' + request.ip + ' on ' +
-    color.yellow(request.fullPath, true)
+    color.red('ERR' + errorCode) +
+      ' ' +
+      request.ip +
+      ' on ' +
+      color.yellow(request.fullPath, true)
   )
 }
 
-function help () {
+function help() {
   version()
-  fs.createReadStream(path.join(__dirname, '..', 'help.txt'))
-    .pipe(process.stderr)
+  fs.createReadStream(path.join(__dirname, '..', 'help.txt')).pipe(
+    process.stderr
+  )
 }
 
-function version () {
+function version() {
   console.log('glance version ' + glanceVersion)
 }

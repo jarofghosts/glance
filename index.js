@@ -16,7 +16,7 @@ var RESPONSE_HEADERS = {'content-type': 'text/html;charset=utf-8'}
 
 module.exports = createGlance
 
-function Glance (options) {
+function Glance(options) {
   EE.call(this)
 
   options = xtend(defaults, options || {})
@@ -32,33 +32,33 @@ function Glance (options) {
 
 Glance.prototype = Object.create(EE.prototype)
 
-Glance.prototype.start = function Glance$start () {
+Glance.prototype.start = function Glance$start() {
   var self = this
 
-  self.server = http.createServer(function (req, res) {
+  self.server = http.createServer(function(req, res) {
     self.serveRequest(req, res)
   })
 
   self.server.listen(self.port, emitStarted)
 
-  self.server.addListener('connection', function (con) {
+  self.server.addListener('connection', function(con) {
     con.setTimeout(500)
   })
 
   self.on('error', showError)
 
-  function emitStarted () {
+  function emitStarted() {
     self.emit('started', self.server)
   }
 }
 
-Glance.prototype.stop = function Glance$stop () {
+Glance.prototype.stop = function Glance$stop() {
   if (this.server) {
     this.server.close()
   }
 }
 
-Glance.prototype.serveRequest = function Glance$serveRequest (req, res) {
+Glance.prototype.serveRequest = function Glance$serveRequest(req, res) {
   var request = {}
   var self = this
 
@@ -80,13 +80,18 @@ Glance.prototype.serveRequest = function Glance$serveRequest (req, res) {
     return self.emit('error', 405, request, res)
   }
 
-  if (self.nodot && /^\./.test(path.basename(request.fullPath))) {
+  if (
+    self.nodot &&
+    request.fullPath.split(path.sep).some(function(dir) {
+      return dir.startsWith('.')
+    })
+  ) {
     return self.emit('error', 404, request, res)
   }
 
   fs.stat(request.fullPath, statFile)
 
-  function statFile (err, stat) {
+  function statFile(err, stat) {
     if (err) {
       return self.emit('error', 404, request, res)
     }
@@ -109,10 +114,10 @@ Glance.prototype.serveRequest = function Glance$serveRequest (req, res) {
 
     findIndex(indices.shift())
 
-    function findIndex (indexTest) {
+    function findIndex(indexTest) {
       fileExists(path.join(request.fullPath, indexTest), check)
 
-      function check (hasIndex) {
+      function check(hasIndex) {
         if (hasIndex) {
           req.url = req.url + '/' + indexTest
 
@@ -127,7 +132,7 @@ Glance.prototype.serveRequest = function Glance$serveRequest (req, res) {
       }
     }
 
-    function listFiles () {
+    function listFiles() {
       var listPath = request.fullPath.replace(/\/$/, '')
 
       res.writeHead(200, RESPONSE_HEADERS)
@@ -136,11 +141,11 @@ Glance.prototype.serveRequest = function Glance$serveRequest (req, res) {
 
       var listing = htmlls(listPath, {hideDot: self.nodot})
 
-      listing.on('data', function (buf) {
+      listing.on('data', function(buf) {
         listingHtml += buf.toString()
       })
 
-      listing.on('end', function () {
+      listing.on('end', function() {
         renderPage('Directory Listing', listingHtml, res)
       })
 
@@ -149,7 +154,7 @@ Glance.prototype.serveRequest = function Glance$serveRequest (req, res) {
   }
 }
 
-function showError (errorCode, req, res) {
+function showError(errorCode, req, res) {
   res.writeHead(errorCode, RESPONSE_HEADERS)
 
   var errorHtml = ''
@@ -158,27 +163,27 @@ function showError (errorCode, req, res) {
     path.join(__dirname, 'errors', errorCode + '.html')
   )
 
-  errorPage.on('data', function (buf) {
+  errorPage.on('data', function(buf) {
     errorHtml += buf.toString()
   })
 
-  errorPage.on('end', function () {
+  errorPage.on('end', function() {
     var title = errorTitle(errorCode)
     renderPage(title, errorHtml, res)
   })
 }
 
-function renderPage (title, body, res) {
+function renderPage(title, body, res) {
   var layout = fs.createReadStream(
     path.join(__dirname, 'errors/shared/layout.html')
   )
   layout
-  .pipe(replace(/{{\s*title\s*}}/g, title))
-  .pipe(replace(/{{\s*body\s*}}/g, body))
-  .pipe(res)
+    .pipe(replace(/{{\s*title\s*}}/g, title))
+    .pipe(replace(/{{\s*body\s*}}/g, body))
+    .pipe(res)
 }
 
-function errorTitle (errorCode) {
+function errorTitle(errorCode) {
   var mappings = {
     '404': 'File Not Found',
     '403': 'Forbidden',
@@ -188,6 +193,6 @@ function errorTitle (errorCode) {
   return mappings[errorCode.toString()]
 }
 
-function createGlance (options) {
+function createGlance(options) {
   return new Glance(options)
 }

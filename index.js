@@ -35,13 +35,13 @@ Glance.prototype = Object.create(EE.prototype)
 Glance.prototype.start = function Glance$start() {
   var self = this
 
-  self.server = http.createServer(function(req, res) {
+  self.server = http.createServer(function (req, res) {
     self.serveRequest(req, res)
   })
 
   self.server.listen(self.port, emitStarted)
 
-  self.server.addListener('connection', function(con) {
+  self.server.addListener('connection', function (con) {
     con.setTimeout(500)
   })
 
@@ -82,7 +82,7 @@ Glance.prototype.serveRequest = function Glance$serveRequest(req, res) {
 
   if (
     self.nodot &&
-    request.fullPath.split(path.sep).some(function(dir) {
+    request.fullPath.split(path.sep).some(function (dir) {
       return dir.startsWith('.')
     })
   ) {
@@ -139,13 +139,21 @@ Glance.prototype.serveRequest = function Glance$serveRequest(req, res) {
 
       var listingHtml = '<h3>Directory Listing</h3>'
 
-      var listing = htmlls(listPath, {hideDot: self.nodot})
+      var listing = htmlls(listPath, {
+        hideDot: self.nodot,
+        transformHref: function (str) {
+          return encodeURI(str)
+        },
+        transformLinkText: function (str) {
+          return str.replace(/\</g, '&lt;').replace(/\>/g, '&gt;')
+        },
+      })
 
-      listing.on('data', function(buf) {
+      listing.on('data', function (buf) {
         listingHtml += buf.toString()
       })
 
-      listing.on('end', function() {
+      listing.on('end', function () {
         renderPage('Directory Listing', listingHtml, res)
       })
 
@@ -163,11 +171,11 @@ function showError(errorCode, req, res) {
     path.join(__dirname, 'errors', errorCode + '.html')
   )
 
-  errorPage.on('data', function(buf) {
+  errorPage.on('data', function (buf) {
     errorHtml += buf.toString()
   })
 
-  errorPage.on('end', function() {
+  errorPage.on('end', function () {
     var title = errorTitle(errorCode)
     renderPage(title, errorHtml, res)
   })
@@ -188,7 +196,7 @@ function errorTitle(errorCode) {
     '404': 'File Not Found',
     '403': 'Forbidden',
     '405': 'Method Not Allowed',
-    '500': 'Internal Server Error'
+    '500': 'Internal Server Error',
   }
   return mappings[errorCode.toString()]
 }

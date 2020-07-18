@@ -6,30 +6,30 @@ var glance = require('../')
 
 var glanceServer = glance({port: 1666, dir: './test/glance-test', nodot: true})
 
-test('doesnt explode immediately', function(t) {
+test('doesnt explode immediately', function (t) {
   t.plan(1)
 
-  t.doesNotThrow(function() {
+  t.doesNotThrow(function () {
     glanceServer.start()
   })
 })
 
-test('404s if dot dir with nodot', function(t) {
+test('404s if dot dir with nodot', function (t) {
   t.plan(2)
 
-  http.get('http://localhost:1666/.test/whatever.txt', function(res) {
+  http.get('http://localhost:1666/.test/whatever.txt', function (res) {
     t.strictEqual(res.statusCode, 404)
   })
 
-  http.get('http://localhost:1666/test1/.test2/lol.txt', function(res) {
+  http.get('http://localhost:1666/test1/.test2/lol.txt', function (res) {
     t.strictEqual(res.statusCode, 404)
   })
 })
 
-test('shuts down without exploding', function(t) {
+test('shuts down without exploding', function (t) {
   t.plan(1)
 
-  t.doesNotThrow(function() {
+  t.doesNotThrow(function () {
     glanceServer.stop()
   })
 })

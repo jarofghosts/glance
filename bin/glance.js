@@ -25,7 +25,7 @@ var noptions = {
   port: Number,
   verbose: Boolean,
   help: Boolean,
-  version: Boolean
+  version: Boolean,
 }
 
 var shorts = {
@@ -36,7 +36,7 @@ var shorts = {
   p: ['--port'],
   v: ['--verbose'],
   h: ['--help'],
-  V: ['--version']
+  V: ['--version'],
 }
 
 var glanceVersion = require('../package.json').version

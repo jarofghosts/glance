@@ -62,9 +62,11 @@ Glance.prototype.serveRequest = function Glance$serveRequest(req, res) {
   var request = {}
   var self = this
 
+  var requestPath = decodeURIComponent(parse(req.url).pathname)
+
   request.fullPath = path.join(
     self.dir,
-    decodeURIComponent(parse(req.url).pathname)
+    requestPath
   )
 
   request.ip = req.socket.remoteAddress
@@ -89,7 +91,20 @@ Glance.prototype.serveRequest = function Glance$serveRequest(req, res) {
     return self.emit('error', 404, request, res)
   }
 
-  fs.stat(request.fullPath, statFile)
+  var faviconPath = path.join(self.dir, 'favicon.ico')
+
+  if (request.method === 'get' && requestPath === '/favicon.ico') {
+    fs.stat(faviconPath, serveFavicon)
+  } else {
+    fs.stat(request.fullPath, statFile)
+  }
+
+  function serveFavicon (err, stat) {
+    if (err) {
+      faviconPath = path.join(__dirname, 'public', 'favicon.ico')
+    }
+    return fs.createReadStream(faviconPath).pipe(res)
+  }
 
   function statFile(err, stat) {
     if (err) {

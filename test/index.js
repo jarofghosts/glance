@@ -1,4 +1,5 @@
 var http = require('http')
+var net = require('net')
 
 var test = require('tape')
 
@@ -74,8 +75,38 @@ test('403s on dir list if configured', function (t) {
 test('fails if path traversal is attempted', function (t) {
   t.plan(1)
 
-  http.get('http://localhost:1666/../index.js', function (res) {
-    t.notStrictEqual(res.statusCode, 200)
+  var socket = new net.Socket()
+  socket.connect(1666, 'localhost', function () {
+    socket.on('data', function (data) {
+      var result = data.toString().split('\n')[0]
+      t.equals(result.trim(), 'HTTP/1.1 403 Forbidden')
+      socket.end()
+    })
+    socket.write(`GET /../index.js HTTP/1.1
+Host: localhost
+user-agent: test/1.2.3
+accept: */*
+
+`)
+  })
+})
+
+test('fails if path traversal with conveniently-named directory is attempted', function (t) {
+  t.plan(1)
+
+  var socket = new net.Socket()
+  socket.connect(1666, 'localhost', function () {
+    socket.on('data', function (data) {
+      var result = data.toString().split('\n')[0]
+      t.equals(result.trim(), 'HTTP/1.1 403 Forbidden')
+      socket.end()
+    })
+    socket.write(`GET /../glance-test-exploit/secret.txt HTTP/1.1
+Host: localhost
+user-agent: test/1.2.3
+accept: */*
+
+`)
   })
 })
 

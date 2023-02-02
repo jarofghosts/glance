@@ -24,7 +24,7 @@ function Glance(options) {
   this.port = options.port
   this.hideindex = options.hideindex
   this.indices = options.indices
-  this.dir = path.normalize(options.dir)
+  this.dir = path.resolve(options.dir)
   this.nodot = options.nodot
 
   return this
@@ -72,7 +72,7 @@ Glance.prototype.serveRequest = function Glance$serveRequest(req, res) {
   request.response = res
 
   // prevent traversing directories that are parents of the root
-  if (request.fullPath.slice(0, self.dir.length) !== self.dir) {
+  if (path.relative(self.dir, request.fullPath).startsWith('..')) {
     return self.emit('error', 403, request, res)
   }
 
@@ -193,10 +193,10 @@ function renderPage(title, body, res) {
 
 function errorTitle(errorCode) {
   var mappings = {
-    '404': 'File Not Found',
-    '403': 'Forbidden',
-    '405': 'Method Not Allowed',
-    '500': 'Internal Server Error',
+    404: 'File Not Found',
+    403: 'Forbidden',
+    405: 'Method Not Allowed',
+    500: 'Internal Server Error',
   }
   return mappings[errorCode.toString()]
 }
